@@ -25,9 +25,3 @@ export type ExtractorType = {
   email: string;
   evoke: (html: string) => Post[];
 };
-
-export type FormattedSecondaryDataType = {
-  subredditResults: Post[];
-  hnResults: Post[];
-  xPostsResults: Post[];
-};
