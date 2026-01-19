@@ -1,7 +1,6 @@
 import express from "express";
 import { config } from "dotenv";
 import { Sources } from "./source";
-import Cache from "./external/cache";
 import compression from "compression";
 import * as bodyParser from "body-parser";
 import gmailClient from "./external/gmailclient.js";
@@ -13,6 +12,7 @@ import { RedditSource } from "./fetcher/sources/RedditSource";
 import { HackerNewsSource } from "./fetcher/sources/HackerNewsSource";
 import { XSource } from "./fetcher/sources/XSource";
 import { logger } from "./external/logger";
+import { cache } from "./external/cache";
 
 // Inject env variables
 config();
@@ -31,8 +31,6 @@ aggregator.sources = [
   }),
 ];
 
-// Initiate singleton cache
-const cache = new Cache();
 // Initiate singleton email handler
 const emailHandler = new EmailHandler();
 
@@ -73,13 +71,13 @@ app.get("/all", (req, res) => {
 
   aggregator.isRunning = true;
 
+  logger.info("Aggregation started");
   aggregator
     .fetchContent()
     .catch((err) => console.error(err))
     .finally(() => {
       aggregator.isRunning = false;
     });
-  logger.info("Aggregation started");
   res.status(202).json({ message: "Aggregation started" });
 });
 

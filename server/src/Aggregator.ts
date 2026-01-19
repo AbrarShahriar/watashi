@@ -1,3 +1,4 @@
+import { cache } from "./external/cache";
 import { logger } from "./external/logger";
 import { SourceBase } from "./fetcher/SourceBase";
 import { Post } from "./types";
@@ -28,6 +29,14 @@ export class Aggregator {
     }
 
     logger.info(`Aggregation finished`);
+
+    try {
+      logger.info(`Caching results`);
+      await cache.set(posts);
+      logger.info(`Caching successful`);
+    } catch (error) {
+      logger.error(`Caching failed: ${error}`);
+    }
     return posts;
   }
 }

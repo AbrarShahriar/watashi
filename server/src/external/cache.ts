@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 
-export default class Cache {
+class Cache {
   public filename: string;
   public data: unknown;
 
@@ -63,3 +63,6 @@ export default class Cache {
     );
   }
 }
+
+// Initiate singleton cache
+export const cache = new Cache();
