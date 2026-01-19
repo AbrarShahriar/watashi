@@ -1,0 +1,201 @@
+import express from "express";
+import { config } from "dotenv";
+import { Sources } from "./source";
+import Cache from "./external/cache";
+import compression from "compression";
+import * as bodyParser from "body-parser";
+import gmailClient from "./external/gmailclient.js";
+import { EmailHandler } from "./email/email";
+import { gmail_v1 } from "googleapis";
+import { EmailType } from "./types";
+import { Aggregator } from "./Aggregator";
+import { RedditSource } from "./fetcher/sources/RedditSource";
+import { HackerNewsSource } from "./fetcher/sources/HackerNewsSource";
+import { XSource } from "./fetcher/sources/XSource";
+import { logger } from "./external/logger";
+
+// Inject env variables
+config();
+
+// Aggregator
+const aggregator = new Aggregator();
+aggregator.sources = [
+  new RedditSource({ subreddits: Sources.subreddits }),
+  new HackerNewsSource(),
+  new XSource({
+    users: Sources.xUsers,
+    auth: {
+      gSearchCx: process.env.GOOGLE_SEARCH_CX as string,
+      gSearchKey: process.env.GOOGLE_SEARCH_KEY as string,
+    },
+  }),
+];
+
+// Initiate singleton cache
+const cache = new Cache();
+// Initiate singleton email handler
+const emailHandler = new EmailHandler();
+
+// Setup express app
+const app = express();
+
+// Express middlewares
+app.use(compression());
+app.use(bodyParser.json());
+
+// Default route
+app.get("/", async (req, res) => {
+  logger.info("Health check hit");
+  res.status(200).send("OK");
+});
+
+// Feed Route
+app.get("/feed", async (req, res) => {
+  let posts = await cache.get();
+  let emails = await emailHandler.getEmailsFromFile();
+  if (!posts || !posts.data) posts = { data: [], lastUpdated: "-1" };
+  if (!emails) emails = [];
+
+  const feed = {
+    emails,
+    posts: posts.data,
+  };
+
+  res.status(200).json(feed);
+});
+
+// Fetch route for cron job
+app.get("/all", (req, res) => {
+  if (aggregator.isRunning) {
+    logger.info("Aggregation already running");
+    return res.status(202).json({ message: "Aggregation already running" });
+  }
+
+  aggregator.isRunning = true;
+
+  aggregator
+    .fetchContent()
+    .catch((err) => console.error(err))
+    .finally(() => {
+      aggregator.isRunning = false;
+    });
+  logger.info("Aggregation started");
+  res.status(202).json({ message: "Aggregation started" });
+});
+
+// Webhook to get newsletter updates
+app.post("/gmail/push", async (req, res) => {
+  try {
+    const msg = req.body.message;
+
+    let data = Buffer.from(msg.data, "base64").toString();
+    data = JSON.parse(data);
+
+    // Extract history ID from GCP
+    const historyId = await emailHandler.getLastHistoryId();
+    console.log("Using History ID: ", historyId);
+
+    // Get the updated history records, contains the new emails' id
+    const updatedHistoryRecords =
+      await emailHandler.getUpdatedHistoryRecords(historyId);
+
+    const emailsToLoad = [];
+
+    // Extract the email ids and fetch their data
+    for (let i = 0; i < updatedHistoryRecords.length; i++) {
+      if (
+        updatedHistoryRecords &&
+        updatedHistoryRecords[i] &&
+        updatedHistoryRecords[i].messagesAdded
+      ) {
+        for (
+          let j = 0;
+          j <
+          (
+            updatedHistoryRecords[i]
+              .messagesAdded as gmail_v1.Schema$HistoryMessageAdded[]
+          ).length;
+          j++
+        ) {
+          const message = (
+            updatedHistoryRecords[i]
+              .messagesAdded as gmail_v1.Schema$HistoryMessageAdded[]
+          )[j].message;
+          if (message && message.id) {
+            emailsToLoad.push(emailHandler.getEmailData(message.id));
+          }
+        }
+      }
+    }
+
+    const emailResults = await Promise.allSettled([...emailsToLoad]);
+
+    const successful = emailResults
+      .filter((r) => r.status === "fulfilled")
+      .map((r) => r.value);
+
+    if (successful.length > 0) {
+      const emails: EmailType[] = [];
+      successful
+        .filter(
+          (email) =>
+            email && email.from && EmailHandler.Allowed.includes(email.from),
+        )
+        .forEach((email: EmailType | null) => {
+          if (email) {
+            emails.push({
+              id: email.id,
+              subject: email.subject,
+              from: email.from,
+              historyId: email.historyId,
+              receivedAt: email.date,
+              posts: emailHandler.getPostsFromEmail(email),
+            });
+            console.log(email.subject, email.from, email.historyId, email.text);
+          }
+        });
+
+      // Update the last history ID
+      const latestHistoryId = successful[successful.length - 1] as EmailType;
+      await emailHandler.setLastHistoryId(latestHistoryId.historyId as string);
+      await emailHandler.saveEmails(emails);
+    }
+
+    res.status(200).send("OK");
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).send("Error");
+  }
+});
+
+// Renew Google PubSub Watch
+app.get("/watch-renew", async (req, res) => {
+  const gClient = gmailClient();
+
+  try {
+    const response = await gClient.users.watch({
+      userId: "me",
+      requestBody: {
+        topicName: "projects/watashi-fido/topics/gmail-update",
+        labelIds: ["INBOX"],
+        labelFilterAction: "include",
+      },
+    });
+    const { historyId, expiration } = response.data;
+    historyId && (await emailHandler.setLastHistoryId(historyId));
+
+    res
+      .status(200)
+      .json({ historyId, expiration: new Date(Number(expiration)) });
+  } catch (e) {
+    console.error("Watch error", e);
+    res.status(500).send("Failed to renew watch");
+  }
+});
+
+// Start server
+app.listen(5000, async (err) => {
+  if (err) logger.error(err);
+  logger.info("Server started at 5000");
+  await emailHandler.loadPrevMails();
+});
