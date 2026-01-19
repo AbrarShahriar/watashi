@@ -10,18 +10,30 @@ export default class Cache {
   }
 
   async get() {
-    const time = await fs.readFile("./src/cache/timestamp.txt", {
-      encoding: "utf-8",
-    });
+    let time: string | number = 0;
+    try {
+      time = await fs.readFile("./src/cache/timestamp.txt", {
+        encoding: "utf-8",
+      });
+    } catch (error) {
+      time = new Date().getTime();
+    }
 
     if (this.data) return { data: this.data, lastUpdated: time };
 
     if (this.data == null) {
       try {
-        const file = await fs.readFile(`./src/cache/${this.filename}`, {
-          encoding: "utf-8",
-        });
-        const data = JSON.parse(file);
+        let fileData = "{}";
+        try {
+          fileData = await fs.readFile(`./src/cache/${this.filename}`, {
+            encoding: "utf-8",
+          });
+        } catch {
+          await fs.writeFile(`./src/cache/${this.filename}`, fileData, {
+            encoding: "utf-8",
+          });
+        }
+        const data = JSON.parse(fileData);
         this.data = data;
       } catch (error) {
         this.data = null;
@@ -39,7 +51,7 @@ export default class Cache {
       JSON.stringify(this.data),
       {
         encoding: "utf-8",
-      }
+      },
     );
 
     await fs.writeFile(
@@ -47,7 +59,7 @@ export default class Cache {
       JSON.stringify(Date.now()),
       {
         encoding: "utf-8",
-      }
+      },
     );
   }
 }

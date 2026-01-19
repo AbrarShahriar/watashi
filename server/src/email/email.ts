@@ -55,7 +55,7 @@ export class EmailHandler {
           (message) =>
             message &&
             message.id &&
-            emailsToLoad.push(this.getEmailData(message.id))
+            emailsToLoad.push(this.getEmailData(message.id)),
         );
 
         const emailResults = await Promise.allSettled([...emailsToLoad]);
@@ -67,7 +67,7 @@ export class EmailHandler {
         if (successful.length > 0) {
           successful
             .filter(
-              (email) => email && EmailHandler.Allowed.includes(email.from)
+              (email) => email && EmailHandler.Allowed.includes(email.from),
             )
             .forEach((email: EmailType | null) => {
               email &&
@@ -145,7 +145,7 @@ export class EmailHandler {
 
     let emailFrom = from;
     const formattedFrom = from?.match(
-      /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi
+      /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi,
     );
 
     if (formattedFrom && formattedFrom?.length && formattedFrom.length > 0) {
@@ -190,9 +190,9 @@ export class EmailHandler {
         emails.filter(
           (email) =>
             !prevEmailsData.some(
-              (prevEmail: any) => prevEmail.id === (email as any).id
-            )
-        )
+              (prevEmail: any) => prevEmail.id === (email as any).id,
+            ),
+        ),
       );
     } else {
       newEmailsData = emails;
@@ -205,15 +205,15 @@ export class EmailHandler {
       JSON.stringify(newEmailsData),
       {
         encoding: "utf-8",
-      }
+      },
     );
   }
 
   async getEmailsFromFile() {
-    const res = await fs.readFile("./src/email/emails.json", {
-      encoding: "utf-8",
-    });
     try {
+      const res = await fs.readFile("./src/email/emails.json", {
+        encoding: "utf-8",
+      });
       return JSON.parse(res);
     } catch (error) {
       return [];
