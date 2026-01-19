@@ -1,18 +1,21 @@
 import fs from "fs/promises";
+import { directoryExists } from "../util";
 
 class Cache {
-  public filename: string;
-  public data: unknown;
+  private filename: string;
+  private data: unknown;
+  private path: string;
 
   constructor(filename?: string) {
     this.filename = filename || "feed.json";
+    this.path = "cache";
     this.data = null;
   }
 
   async get() {
     let time: string | number = 0;
     try {
-      time = await fs.readFile("./src/cache/timestamp.txt", {
+      time = await fs.readFile(`${this.path}/timestamp.txt`, {
         encoding: "utf-8",
       });
     } catch (error) {
@@ -25,11 +28,11 @@ class Cache {
       try {
         let fileData = "{}";
         try {
-          fileData = await fs.readFile(`./src/cache/${this.filename}`, {
+          fileData = await fs.readFile(`${this.path}/${this.filename}`, {
             encoding: "utf-8",
           });
         } catch {
-          await fs.writeFile(`./src/cache/${this.filename}`, fileData, {
+          await fs.writeFile(`${this.path}/${this.filename}`, fileData, {
             encoding: "utf-8",
           });
         }
@@ -46,8 +49,10 @@ class Cache {
   async set(data: unknown) {
     this.data = data;
 
+    await this.createParentDirectoryIfNotFound();
+
     await fs.writeFile(
-      `./src/cache/${this.filename}`,
+      `${this.path}/${this.filename}`,
       JSON.stringify(this.data),
       {
         encoding: "utf-8",
@@ -55,12 +60,17 @@ class Cache {
     );
 
     await fs.writeFile(
-      "./src/cache/timestamp.txt",
+      `${this.path}/timestamp.txt`,
       JSON.stringify(Date.now()),
       {
         encoding: "utf-8",
       },
     );
+  }
+
+  private async createParentDirectoryIfNotFound() {
+    const folderExists = await directoryExists(`cache`);
+    if (!folderExists) await fs.mkdir(this.path);
   }
 }
 

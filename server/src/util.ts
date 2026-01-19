@@ -1,5 +1,6 @@
 import { CheerioAPI } from "cheerio";
 import sanitizeHtml from "sanitize-html";
+import fs from "fs/promises";
 
 export function truncate(str: string) {
   return str.slice(0, Math.ceil(str.length / 3)) + "...";
@@ -25,4 +26,13 @@ export function clean(dom: CheerioAPI) {
   dom('*:contains("Presented by")').remove();
   dom('*:contains("Sponsored by")').remove();
   dom('*:contains("This post is sponsored")').remove();
+}
+
+export async function directoryExists(path: string) {
+  try {
+    await fs.access(path, fs.constants.F_OK);
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
