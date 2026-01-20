@@ -14,6 +14,7 @@ type RedditRaw = {
   ups: number;
   downs: number;
   score: number;
+  stickied: boolean;
 };
 
 export class RedditSource extends SourceBase {
@@ -27,6 +28,11 @@ export class RedditSource extends SourceBase {
   public async fetchSingle(subreddit: string): Promise<Post[]> {
     const res = await fetch(
       `https://www.reddit.com/r/${subreddit}/hot.json?raw_json=1&limit=5`,
+      {
+        headers: {
+          "User-Agent": "web:watashi:v0.1 (by /u/AbrarShahriar)",
+        },
+      },
     );
 
     if (!res.ok) {
@@ -59,20 +65,22 @@ export class RedditSource extends SourceBase {
   }
 
   parseContent(rawData: RedditRaw[]): RedditPost[] {
-    return rawData.map((post: RedditRaw) => ({
-      id: post.id,
-      url: post.url,
-      title: post.title,
-      description: post.selftext,
-      source: post.subreddit,
-      author: post.author_fullname,
-      createdAt: post.created_utc * 1000,
-      metadata: {
-        score: post.score,
-        ups: post.ups,
-        downs: -post.downs,
-      },
-    }));
+    return rawData
+      .filter((entry) => entry.stickied == false)
+      .map((post: RedditRaw) => ({
+        id: post.id,
+        url: post.url,
+        title: post.title,
+        description: post.selftext,
+        source: post.subreddit,
+        author: post.author_fullname,
+        createdAt: post.created_utc * 1000,
+        metadata: {
+          score: post.score,
+          ups: post.ups,
+          downs: -post.downs,
+        },
+      }));
   }
 
   async healthCheck(): Promise<boolean> {
