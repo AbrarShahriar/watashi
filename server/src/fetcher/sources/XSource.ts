@@ -1,4 +1,4 @@
-import { Post } from "../../types";
+import { Post, XPost } from "../../types";
 import { SourceBase } from "../SourceBase";
 
 type XUser = {
@@ -72,8 +72,8 @@ export class XSource extends SourceBase {
     return posts;
   }
 
-  parseContent(rawData: XRaw[][], metadata: { user: XUser }): Post[] {
-    const parsedPosts: Post[] = [];
+  parseContent(rawData: XRaw[][], metadata: { user: XUser }): XPost[] {
+    const parsedPosts: XPost[] = [];
 
     for (let i = 0; i < rawData.length; i++) {
       for (let j = 0; j < rawData[i].length; j++) {
@@ -86,6 +86,7 @@ export class XSource extends SourceBase {
           const datepublishedFound = currentItem.datepublished;
 
           if (userFound && positionFound && datepublishedFound && !isbasedon) {
+            const numOfComments = 10;
             parsedPosts.push({
               id: currentItem.identifier,
               author: metadata.user.username,
@@ -96,7 +97,7 @@ export class XSource extends SourceBase {
               title:
                 currentItem.headline || `Post by ${metadata.user.displayname}`,
               metadata: {
-                numOfComments: currentItem.commentcount,
+                numOfComments: parseInt(currentItem.commentcount),
               },
             });
           }

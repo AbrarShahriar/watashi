@@ -1,3 +1,4 @@
+import winston from "winston";
 import { logger } from "../external/logger";
 import { Post } from "../types";
 import { CircuitBreaker } from "./CircuitBreaker";
@@ -30,10 +31,12 @@ export abstract class SourceBase implements ISourceBase {
   id!: string;
   public circuitBreaker: CircuitBreaker;
   public retry: Retry;
+  public logger: winston.Logger;
 
   constructor(config?: unknown) {
     this.circuitBreaker = new CircuitBreaker(1, 30000, 10000);
     this.retry = new Retry(1, 1000, 10000);
+    this.logger = logger;
   }
 
   async withCircuitRetry<T>(operation: () => Promise<T>, label?: string) {

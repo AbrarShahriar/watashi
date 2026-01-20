@@ -27,7 +27,7 @@ export class Retry {
 
         const delay = this.calculateDelay(attempt);
         logger.error(
-          `${operationName} failed (attempt ${attempt + 1}/${this.maxRetries + 1}), retrying in ${delay}ms`,
+          `${operationName} failed (attempt ${attempt + 1}/${this.maxRetries + 1}) --- ${error}, retrying in ${delay}ms`,
         );
 
         await this.delay(delay);

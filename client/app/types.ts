@@ -6,7 +6,7 @@ export type Post = {
   author: string;
   createdAt: string | number;
   url: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 };
 
 export type RedditPost = Post & {
@@ -21,19 +21,13 @@ export type XPost = Post & {
   metadata: { numOfComments: number };
 };
 
-export type EmailType = {
-  id: string;
-  subject: string;
-  from: string;
-  date?: string;
-  html?: string;
-  text?: string;
-  historyId: string;
-  receivedAt?: string;
-  posts?: Post[];
+export type FeedData = {
+  emails: unknown[];
+  posts?: {
+    reddit: RedditPost[];
+    hackernews: HNPost[];
+    x: XPost[];
+  };
 };
 
-export type ExtractorType = {
-  email: string;
-  evoke: (html: string) => Post[];
-};
+export type FeedItem = Omit<Post, "metadata"> & { score: number };

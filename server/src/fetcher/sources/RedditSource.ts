@@ -1,4 +1,4 @@
-import { Post } from "../../types";
+import { Post, RedditPost } from "../../types";
 import { CircuitBreaker } from "../CircuitBreaker";
 import { Retry } from "../Retry";
 import { SourceBase } from "../SourceBase";
@@ -12,8 +12,8 @@ type RedditRaw = {
   created_utc: number;
   url: string;
   ups: number;
-  downs: string;
-  score: string;
+  downs: number;
+  score: number;
 };
 
 export class RedditSource extends SourceBase {
@@ -30,7 +30,9 @@ export class RedditSource extends SourceBase {
     );
 
     if (!res.ok) {
-      throw new Error("Request error");
+      throw new Error(
+        `${subreddit} failed - ${res.status} - ${res.statusText}`,
+      );
     }
 
     const resData = await res.json();
@@ -56,7 +58,7 @@ export class RedditSource extends SourceBase {
     return posts;
   }
 
-  parseContent(rawData: RedditRaw[]): Post[] {
+  parseContent(rawData: RedditRaw[]): RedditPost[] {
     return rawData.map((post: RedditRaw) => ({
       id: post.id,
       url: post.url,
@@ -64,11 +66,11 @@ export class RedditSource extends SourceBase {
       description: post.selftext,
       source: post.subreddit,
       author: post.author_fullname,
-      createdAt: post.created_utc,
+      createdAt: post.created_utc * 1000,
       metadata: {
-        ups: post.ups,
-        downs: post.downs,
         score: post.score,
+        ups: post.ups,
+        downs: -post.downs,
       },
     }));
   }

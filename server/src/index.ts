@@ -13,6 +13,7 @@ import { HackerNewsSource } from "./fetcher/sources/HackerNewsSource";
 import { XSource } from "./fetcher/sources/XSource";
 import { logger } from "./external/logger";
 import { cache } from "./external/cache";
+import cors from "cors";
 
 // Inject env variables
 config();
@@ -40,6 +41,11 @@ const app = express();
 // Express middlewares
 app.use(compression());
 app.use(bodyParser.json());
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+  }),
+);
 
 // Default route
 app.get("/", async (req, res) => {
