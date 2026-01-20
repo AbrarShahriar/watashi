@@ -27,12 +27,7 @@ export class RedditSource extends SourceBase {
 
   public async fetchSingle(subreddit: string): Promise<Post[]> {
     const res = await fetch(
-      `https://www.reddit.com/r/${subreddit}/hot.json?raw_json=1&limit=5`,
-      {
-        headers: {
-          "User-Agent": "web:watashi:v0.1 (by /u/AbrarShahriar)",
-        },
-      },
+      `https://oauth.reddit.com/r/${subreddit}/hot.json?raw_json=1&limit=5`,
     );
 
     if (!res.ok) {
