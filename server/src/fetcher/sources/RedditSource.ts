@@ -1,6 +1,4 @@
 import { Post, RedditPost } from "../../types";
-import { CircuitBreaker } from "../CircuitBreaker";
-import { Retry } from "../Retry";
 import { SourceBase } from "../SourceBase";
 
 type RedditRaw = {
@@ -27,7 +25,7 @@ export class RedditSource extends SourceBase {
 
   public async fetchSingle(subreddit: string): Promise<Post[]> {
     const res = await fetch(
-      `https://oauth.reddit.com/r/${subreddit}/hot.json?raw_json=1&limit=5`,
+      `${process.env.REDDIT_URL}?subreddit=${subreddit}&category=hot&limit=5`,
     );
 
     if (!res.ok) {

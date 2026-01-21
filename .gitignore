@@ -22,3 +22,7 @@ npm-debug.log*
 **/cache/
 **/emails.json
 **/historyid.txt
+
+# Worker
+.wrangler/
+*.wranglerstate

@@ -22,14 +22,14 @@ config();
 const aggregator = new Aggregator();
 aggregator.sources = [
   new RedditSource({ subreddits: Sources.subreddits }),
-  // new HackerNewsSource(),
-  // new XSource({
-  //   users: Sources.xUsers,
-  //   auth: {
-  //     gSearchCx: process.env.GOOGLE_SEARCH_CX as string,
-  //     gSearchKey: process.env.GOOGLE_SEARCH_KEY as string,
-  //   },
-  // }),
+  new HackerNewsSource(),
+  new XSource({
+    users: Sources.xUsers,
+    auth: {
+      gSearchCx: process.env.GOOGLE_SEARCH_CX as string,
+      gSearchKey: process.env.GOOGLE_SEARCH_KEY as string,
+    },
+  }),
 ];
 
 // Initiate singleton email handler
