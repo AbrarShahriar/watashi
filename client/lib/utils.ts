@@ -1,4 +1,4 @@
-import { FeedData, FeedItem } from "@/app/types";
+import { FeedData, FeedItem } from "@/lib/types";
 import { clsx, type ClassValue } from "clsx";
 import { Url } from "next/dist/shared/lib/router/router";
 import { twMerge } from "tailwind-merge";
@@ -31,79 +31,6 @@ export function calculatePerformanceScore(
   return Math.min(100, (sum % 100) + recency);
 }
 
-// Normalize feed data from API response to unified FeedItem array
-export function normalizeFeedData(data: FeedData): FeedItem[] {
-  const items: FeedItem[] = [];
-
-  // Process newsletter emails
-  // data.emails?.forEach((email) => {
-  //   email.posts.forEach((post, index) => {
-  //     const item: FeedItem = {
-  //       id: `${email.id}-${index}`,
-  //       title: post.title,
-  //       link: post.link,
-  //       desc: post.desc,
-  //       source: "Newsletter",
-  //       sourceType: "newsletter",
-  //       performanceScore: 0,
-  //       createdAt: email.receivedAt,
-  //       metadata: {
-  //         emailSubject: email.subject,
-  //         emailFrom: email.from,
-  //       },
-  //     }
-  //     item.performanceScore = calculatePerformanceScore(item.sourceType, item.metadata, item.createdAt)
-  //     items.push(item)
-  //   })
-  // })
-
-  data.posts?.hackernews?.forEach((hn) => {
-    items.push({
-      id: hn.id,
-      title: hn.title,
-      url: hn.url,
-      description: hn.description || "",
-      source: hn.source,
-      score: calculatePerformanceScore(hn.metadata, hn.createdAt),
-      createdAt: hn.createdAt,
-      author: hn.author,
-      media: null,
-    });
-  });
-
-  data.posts?.reddit?.forEach((reddit) => {
-    items.push({
-      id: reddit.id,
-      title: reddit.title,
-      url: reddit.url.startsWith("http")
-        ? reddit.url
-        : `https://reddit.com${reddit.url}`,
-      description: reddit.description || "",
-      source: `r/${reddit.source}`,
-      createdAt: reddit.createdAt,
-      author: reddit.author,
-      score: calculatePerformanceScore(reddit.metadata, reddit.createdAt),
-      media: reddit.media,
-    });
-  });
-
-  data.posts?.x?.forEach((xPost) => {
-    items.push({
-      id: xPost.id,
-      title: xPost.title,
-      url: xPost.url,
-      description: xPost.description,
-      source: "X",
-      createdAt: xPost.createdAt,
-      author: xPost.author,
-      score: calculatePerformanceScore(xPost.metadata, xPost.createdAt),
-      media: null,
-    });
-  });
-
-  return items;
-}
-
 // Format relative time
 export function formatRelativeTime(dateString: string | number): string {
   const date = new Date(dateString);
@@ -125,4 +52,36 @@ export function formatURL(url: string): string {
   } catch (error) {
     return url;
   }
+}
+
+export function sortBy(
+  data: FeedItem[],
+  criteria: "new" | "top",
+  selectedSources?: string[],
+) {
+  let filtered = data;
+
+  if (selectedSources && selectedSources.length > 0) {
+    filtered = filtered.filter((item) => selectedSources.includes(item.source));
+  }
+
+  if (criteria == "top") {
+    return [...filtered].sort((a, b) => {
+      return b.score - a.score;
+    });
+  } else if (criteria == "new") {
+    return [...filtered].sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  } else {
+    return data;
+  }
+}
+
+export function generateSourcesFromData(data: FeedItem[]) {
+  if (data) {
+    const sourceSet = new Set(data.map((item) => item.source));
+    return Array.from(sourceSet).sort();
+  }
+  return [];
 }

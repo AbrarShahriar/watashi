@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Flame } from "lucide-react";
-import { FeedItem } from "@/app/types";
+import { FeedItem } from "@/lib/types";
 import { formatRelativeTime, formatURL } from "@/lib/utils";
 import Image from "next/image";
 

@@ -32,3 +32,4 @@ export type FeedData = {
 };
 
 export type FeedItem = Omit<Post, "metadata"> & { score: number };
+export type FeedFilterSortCriteria = "top" | "new";
