@@ -42,14 +42,16 @@ type RedditRaw = {
 export class RedditSource extends SourceBase {
   readonly id = "reddit";
 
-  constructor(public config: { subreddits: string[] }) {
+  constructor(
+    public config: { subreddits: string[]; redditWorkerUrl: string },
+  ) {
     super(config);
     this.config = config;
   }
 
   public async fetchSingle(subreddit: string): Promise<Post[]> {
     const res = await fetch(
-      `${process.env.REDDIT_URL}?subreddit=${subreddit}&category=hot&limit=5`,
+      `${this.config.redditWorkerUrl}?subreddit=${subreddit}&category=hot&limit=5`,
     );
 
     if (!res.ok) {

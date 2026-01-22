@@ -5,9 +5,13 @@ import { Post } from "./types";
 
 export class Aggregator {
   public isRunning: boolean = false;
-  public sources: SourceBase[] = [];
+  private sources: SourceBase[] = [];
 
   constructor() {}
+
+  addSource(source: SourceBase) {
+    this.sources.push(source);
+  }
 
   async fetchContent(): Promise<Record<string, Post[]>> {
     const posts: Record<string, Post[]> = {};

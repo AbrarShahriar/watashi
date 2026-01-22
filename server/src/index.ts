@@ -20,9 +20,14 @@ config();
 
 // Aggregator
 const aggregator = new Aggregator();
-aggregator.sources = [
-  new RedditSource({ subreddits: Sources.subreddits }),
-  new HackerNewsSource(),
+aggregator.addSource(
+  new RedditSource({
+    subreddits: Sources.subreddits,
+    redditWorkerUrl: process.env.REDDIT_URL!,
+  }),
+);
+aggregator.addSource(new HackerNewsSource());
+aggregator.addSource(
   new XSource({
     users: Sources.xUsers,
     auth: {
@@ -30,7 +35,7 @@ aggregator.sources = [
       gSearchKey: process.env.GOOGLE_SEARCH_KEY as string,
     },
   }),
-];
+);
 
 // Initiate singleton email handler
 const emailHandler = new EmailHandler();
