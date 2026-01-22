@@ -1,5 +1,6 @@
 import { FeedData, FeedItem } from "@/app/types";
 import { clsx, type ClassValue } from "clsx";
+import { Url } from "next/dist/shared/lib/router/router";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -116,4 +117,12 @@ export function formatRelativeTime(dateString: string | number): string {
   if (hours > 0) return `${hours}h ago`;
   if (minutes > 0) return `${minutes}m ago`;
   return "Just now";
+}
+
+export function formatURL(url: string): string {
+  try {
+    return new URL(url).hostname.replace("www.", "");
+  } catch (error) {
+    return url;
+  }
 }

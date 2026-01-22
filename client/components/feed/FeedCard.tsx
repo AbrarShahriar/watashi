@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Flame } from "lucide-react";
 import { FeedItem } from "@/app/types";
-import { formatRelativeTime } from "@/lib/utils";
+import { formatRelativeTime, formatURL } from "@/lib/utils";
 import Image from "next/image";
 
 interface FeedCardProps {
@@ -105,7 +105,7 @@ export function FeedCard({ item }: FeedCardProps) {
               className={`flex items-center gap-1 text-xs text-muted-foreground/60 group-hover:${styles.accent} transition-colors`}
             >
               <span className="truncate max-w-[100px] hidden sm:inline">
-                {new URL(item.url).hostname.replace("www.", "")}
+                {formatURL(item.url)}
               </span>
               <ExternalLink className="h-3 w-3 flex-shrink-0" />
             </div>
