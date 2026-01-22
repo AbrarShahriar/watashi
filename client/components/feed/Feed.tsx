@@ -2,24 +2,18 @@ import { FeedCard } from "./FeedCard";
 import { getFeedData } from "@/data/feed-dto";
 import FeedHeader from "./FeedHeader";
 import { generateSourcesFromData, sortBy } from "@/lib/utils";
-import { FeedFilterSortCriteria } from "@/lib/types";
+import { Suspense } from "react";
 
-export default async function FeedPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ category: FeedFilterSortCriteria; sources: string }>;
-}) {
+export default async function FeedPage() {
   const feedData = await getFeedData();
   const sortedFeed = sortBy(feedData, "top") || [];
   const sources = generateSourcesFromData(feedData);
 
   return (
     <div className="min-h-screen bg-background">
-      <FeedHeader
-        sources={sources}
-        data={sortedFeed}
-        searchParams={searchParams}
-      />
+      <Suspense>
+        <FeedHeader sources={sources} data={sortedFeed} />
+      </Suspense>
 
       {/* Feed */}
       <main className="mx-auto max-w-3xl px-4 py-6">

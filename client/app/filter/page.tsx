@@ -35,7 +35,10 @@ export default async function Filter({
         <FeedHeader
           sources={uniqSources}
           data={sortedFeed}
-          searchParams={searchParams}
+          searchParams={{
+            category,
+            sources,
+          }}
         />
       </Suspense>
       {/* Feed */}

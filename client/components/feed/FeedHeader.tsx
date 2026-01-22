@@ -3,7 +3,7 @@
 import { FeedFilterSortCriteria, FeedItem } from "@/lib/types";
 import { TrendingUp, Clock, Filter, MoveRight } from "lucide-react";
 import { Button } from "../ui/button";
-import { use, useState } from "react";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -13,30 +13,33 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Badge } from "../ui/badge";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 interface Props {
   data: FeedItem[];
   sources: string[];
-  searchParams: Promise<{
+  searchParams?: {
     category?: FeedFilterSortCriteria;
     sources?: string;
-  }>;
+  };
 }
-export default function FeedHeader({ data, sources, searchParams }: Props) {
-  const params = use(searchParams);
+export default function FeedHeader({
+  data,
+  sources,
+  searchParams: params,
+}: Props) {
   const router = useRouter();
-  const [query, setQuery] = useState(params.toString());
+  const [query, setQuery] = useState((params && params.toString()) || "");
 
   const [filterMutated, setFilterMutated] = useState(false);
 
   const [sortCriteria, setSortCriteria] = useState<FeedFilterSortCriteria>(
-    (params.category as FeedFilterSortCriteria) || "top",
+    (params && (params.category as FeedFilterSortCriteria)) || "top",
   );
 
   const [selectedSources, setSelectedSources] = useState<Set<string>>(
-    new Set(params.sources?.split(",") || []),
+    new Set((params && params.sources?.split(",")) || []),
   );
   const toggleSource = (source: string) => {
     const newSelected = new Set(selectedSources);
