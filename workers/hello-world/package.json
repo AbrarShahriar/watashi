@@ -1,0 +1,8 @@
+{
+	"name": "hello-world",
+	"scripts": {
+		"dev": "wrangler dev --local",
+		"deploy": "wrangler deploy",
+		"cf-typegen": "wrangler types"
+	}
+}

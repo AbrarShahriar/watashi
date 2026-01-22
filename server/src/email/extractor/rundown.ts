@@ -49,6 +49,7 @@ export default function rundownExtractor(html: string): Post[] {
       author: "RundownAI",
       createdAt: Date.now().toString(),
       metadata: { score: 100 },
+      media: null,
     });
   }
 

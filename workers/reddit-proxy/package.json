@@ -1,0 +1,8 @@
+{
+	"name": "reddit-proxy",
+	"scripts": {
+		"dev": "wrangler dev --local",
+		"deploy": "wrangler deploy",
+		"cf-typegen": "wrangler types"
+	}
+}

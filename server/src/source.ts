@@ -1,4 +1,5 @@
 const subreddits = [
+  "ASCII",
   "ArtificialInteligence",
   "cscareerquestions",
   "csMajors",

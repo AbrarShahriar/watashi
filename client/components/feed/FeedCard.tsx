@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Flame } from "lucide-react";
 import { FeedItem } from "@/app/types";
 import { formatRelativeTime } from "@/lib/utils";
+import Image from "next/image";
 
 interface FeedCardProps {
   item: FeedItem;
@@ -45,6 +46,7 @@ function getSourceStyles(source: string): {
 export function FeedCard({ item }: FeedCardProps) {
   const styles = getSourceStyles(item.source);
   const isHot = item.score >= 80;
+  console.log(item);
 
   return (
     <Card className="group border-border/40 bg-card/30 hover:bg-card/60 hover:border-border/60 transition-all duration-200">
@@ -71,20 +73,27 @@ export function FeedCard({ item }: FeedCardProps) {
             </span>
           </div>
 
+          {item.media && (
+            <Image
+              className="rounded-xl"
+              width={1000}
+              height={1000}
+              alt={`Post by ${item.author}`}
+              src={item.media}
+            />
+          )}
           {/* Title */}
           <h3
             className={`text-base font-semibold leading-snug text-foreground group-hover:${styles.accent} transition-colors line-clamp-2`}
           >
             {item.title}
           </h3>
-
           {/* Description - only show if exists and not too long */}
           {item.description && (
             <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
               {item.description}
             </p>
           )}
-
           {/* Bottom row: Stats + Link */}
           <div className="flex items-center justify-between pt-1">
             <div className="flex items-center gap-3 text-xs text-muted-foreground">

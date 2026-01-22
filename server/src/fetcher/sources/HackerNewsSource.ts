@@ -47,6 +47,7 @@ export class HackerNewsSource extends SourceBase {
         numOfComments: story.num_comments,
         points: story.points,
       },
+      media: null,
     }));
   }
 

@@ -1,7 +1,5 @@
-import { env } from 'cloudflare:workers';
-
 export default {
-	async fetch(request, _, ctx) {
+	async fetch(request, env, ctx) {
 		const url = new URL(request.url);
 		const subreddit = url.searchParams.get('subreddit');
 		const category = url.searchParams.get('category') || 'hot';
@@ -18,18 +16,20 @@ export default {
 		});
 
 		try {
+			console.log('[info] Sending Request To', { subreddit, category, limit });
+
 			const response = await fetch(redditApiUrl, {
 				headers,
 				method: 'GET',
 			});
 
-			console.log(response.body, response.status, response.statusText);
 			if (!response.ok) {
 				return Response.json({ error: `Reddit API returned ${response.status}: ${response.statusText}` }, { status: response.status });
 			}
 
 			const data = await response.json();
 
+			console.log('[success] Succeeded');
 			return Response.json(data, {
 				headers: {
 					'Access-Control-Allow-Origin': env.BACKEND_URL,
@@ -37,6 +37,7 @@ export default {
 				},
 			});
 		} catch (error: any) {
+			console.error('[error]', error);
 			return Response.json({ error: `Internal Server Error`, message: error.message }, { status: 500 });
 		}
 	},

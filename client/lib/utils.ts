@@ -66,10 +66,10 @@ export function normalizeFeedData(data: FeedData): FeedItem[] {
       score: calculatePerformanceScore(hn.metadata, hn.createdAt),
       createdAt: hn.createdAt,
       author: hn.author,
+      media: null,
     });
   });
 
-  // NEW SCHEMA: Process Reddit results from posts.reddit
   data.posts?.reddit?.forEach((reddit) => {
     items.push({
       id: reddit.id,
@@ -82,6 +82,7 @@ export function normalizeFeedData(data: FeedData): FeedItem[] {
       createdAt: reddit.createdAt,
       author: reddit.author,
       score: calculatePerformanceScore(reddit.metadata, reddit.createdAt),
+      media: reddit.media,
     });
   });
 
@@ -95,6 +96,7 @@ export function normalizeFeedData(data: FeedData): FeedItem[] {
       createdAt: xPost.createdAt,
       author: xPost.author,
       score: calculatePerformanceScore(xPost.metadata, xPost.createdAt),
+      media: null,
     });
   });
 

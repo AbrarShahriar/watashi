@@ -3,17 +3,13 @@
  * https://developers.cloudflare.com/workers/wrangler/configuration/
  */
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "workers",
+	"$schema": "../node_modules/wrangler/config-schema.json",
+	"name": "reddit-proxy",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-09-27",
 	"observability": {
-		"enabled": true
+		"enabled": true,
 	},
-	"vars": {
-		"BACKEND_URL": "http://localhost:5000",
-		"USER_AGENT": "web:watashi:v1.0 (by /u/watashi)"
-	}
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

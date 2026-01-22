@@ -3,15 +3,21 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"deploy": "wrangler deploy",
-		"dev": "wrangler dev",
-		"start": "wrangler dev",
-		"cf-typegen": "wrangler types"
+		"dev:reddit": "npm run dev -w reddit-proxy",
+		"types:reddit": "npm run cf-typegen -w reddit-proxy",
+		"deploy:reddit": "npm run deploy -w reddit-proxy",
+		"dev:hello": "npm run dev -w hello-world",
+		"types:hello": "npm run cf-typegen -w hello-world",
+		"deploy:hello": "npm run deploy -w hello-world"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.12.4",
 		"typescript": "^5.5.2",
 		"vitest": "~3.2.0",
 		"wrangler": "^4.59.3"
-	}
+	},
+	"workspaces": [
+		"reddit-proxy",
+		"hello-world"
+	]
 }

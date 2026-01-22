@@ -13,6 +13,30 @@ type RedditRaw = {
   downs: number;
   score: number;
   stickied: boolean;
+  is_gallery?: boolean;
+  media_metadata?: {
+    [key: string]: {
+      s: {
+        y: number;
+        x: number;
+        u: string;
+      };
+    };
+  };
+  preview?: {
+    images: {
+      source: {
+        url: string;
+        width: number;
+        height: number;
+        resolutions: {
+          url: string;
+          width: number;
+          height: number;
+        }[];
+      };
+    }[];
+  };
 };
 
 export class RedditSource extends SourceBase {
@@ -58,22 +82,38 @@ export class RedditSource extends SourceBase {
   }
 
   parseContent(rawData: RedditRaw[]): RedditPost[] {
-    return rawData
+    const posts: RedditPost[] = [];
+
+    rawData
       .filter((entry) => entry.stickied == false)
-      .map((post: RedditRaw) => ({
-        id: post.id,
-        url: post.url,
-        title: post.title,
-        description: post.selftext,
-        source: post.subreddit,
-        author: post.author_fullname,
-        createdAt: post.created_utc * 1000,
-        metadata: {
-          score: post.score,
-          ups: post.ups,
-          downs: -post.downs,
-        },
-      }));
+      .forEach((post: RedditRaw) => {
+        let media = null;
+
+        if (post.is_gallery && post.media_metadata) {
+          const imageIds = Object.keys(post.media_metadata);
+          media = post.media_metadata[imageIds[0]].s.u || null;
+        } else if (post.preview) {
+          media = post.preview.images[0].source.url || null;
+        }
+
+        posts.push({
+          id: post.id,
+          url: post.url,
+          title: post.title,
+          description: post.selftext,
+          source: post.subreddit,
+          author: post.author_fullname,
+          createdAt: post.created_utc * 1000,
+          metadata: {
+            score: post.score,
+            ups: post.ups,
+            downs: -post.downs,
+          },
+          media,
+        });
+      });
+
+    return posts;
   }
 
   async healthCheck(): Promise<boolean> {

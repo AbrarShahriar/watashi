@@ -7,6 +7,7 @@ export type Post = {
   createdAt: string | number;
   url: string;
   metadata: Record<string, unknown>;
+  media: string | null;
 };
 
 export type RedditPost = Post & {

@@ -12,6 +12,27 @@ type XAuth = {
 };
 
 type XRaw = {
+  kind: string;
+  url: unknown;
+  queries: unknown;
+  context: unknown;
+  searchInformation: unknown;
+  items: {
+    pagemap: {
+      person: {
+        image: string;
+        identifier: string;
+        name: string;
+        alternatename: string;
+        disambiguatingdescription: string;
+        url: string;
+      }[];
+      socialmediaposting: XRawItem[];
+    };
+  }[];
+};
+
+type XRawItem = {
   identifier: string;
   commentcount: string;
   articlebody: string;
@@ -43,14 +64,14 @@ export class XSource extends SourceBase {
       `https://www.googleapis.com/customsearch/v1?key=${this.config.auth.gSearchKey}&cx=${this.config.auth.gSearchCx}&q=${query}&sort=date`,
     );
 
-    const data = await response.json();
+    const data: XRaw = await response.json();
 
     if (!data.items || data.items.length == 0) {
       return [];
     }
 
-    const d: XRaw[][] = data.items.map(
-      (item: { pagemap: { socialmediaposting: XRaw[] } }) =>
+    const d: XRawItem[][] = data.items.map(
+      (item: { pagemap: { socialmediaposting: XRawItem[] } }) =>
         item.pagemap.socialmediaposting,
     );
 
@@ -72,7 +93,7 @@ export class XSource extends SourceBase {
     return posts;
   }
 
-  parseContent(rawData: XRaw[][], metadata: { user: XUser }): XPost[] {
+  parseContent(rawData: XRawItem[][], metadata: { user: XUser }): XPost[] {
     const parsedPosts: XPost[] = [];
 
     for (let i = 0; i < rawData.length; i++) {
@@ -99,6 +120,7 @@ export class XSource extends SourceBase {
               metadata: {
                 numOfComments: parseInt(currentItem.commentcount),
               },
+              media: null,
             });
           }
         }
