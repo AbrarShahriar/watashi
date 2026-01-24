@@ -94,7 +94,7 @@ export class XSource extends SourceBase {
   }
 
   parseContent(rawData: XRawItem[][], metadata: { user: XUser }): XPost[] {
-    const parsedPosts: XPost[] = [];
+    const parsedPostsMap = new Map<string, XPost>();
 
     for (let i = 0; i < rawData.length; i++) {
       for (let j = 0; j < rawData[i].length; j++) {
@@ -107,27 +107,29 @@ export class XSource extends SourceBase {
           const datepublishedFound = currentItem.datepublished;
 
           if (userFound && positionFound && datepublishedFound && !isbasedon) {
-            const numOfComments = 10;
-            parsedPosts.push({
-              id: currentItem.identifier,
-              author: metadata.user.username,
-              createdAt: currentItem.datepublished,
-              url: currentItem.url,
-              source: `X - ${metadata.user.displayname}`,
-              description: currentItem.articlebody || "",
-              title:
-                currentItem.headline || `Post by ${metadata.user.displayname}`,
-              metadata: {
-                numOfComments: parseInt(currentItem.commentcount),
-              },
-              media: null,
-            });
+            if (!parsedPostsMap.has(currentItem.identifier)) {
+              parsedPostsMap.set(currentItem.identifier, {
+                id: currentItem.identifier,
+                author: metadata.user.username,
+                createdAt: currentItem.datepublished,
+                url: currentItem.url,
+                source: `X - ${metadata.user.displayname}`,
+                description: currentItem.articlebody || "",
+                title:
+                  currentItem.headline ||
+                  `Post by ${metadata.user.displayname}`,
+                metadata: {
+                  numOfComments: parseInt(currentItem.commentcount),
+                },
+                media: null,
+              });
+            }
           }
         }
       }
     }
 
-    return parsedPosts;
+    return Array.from(parsedPostsMap.values());
   }
 
   async healthCheck(): Promise<boolean> {

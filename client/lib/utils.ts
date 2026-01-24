@@ -56,7 +56,7 @@ export function formatURL(url: string): string {
 
 export function sortBy(
   data: FeedItem[],
-  criteria: "new" | "top",
+  criteria?: "new" | "top",
   selectedSources?: string[],
 ) {
   let filtered = data;
@@ -73,9 +73,9 @@ export function sortBy(
     return [...filtered].sort((a, b) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-  } else {
-    return data;
   }
+
+  return filtered;
 }
 
 export function generateSourcesFromData(data: FeedItem[]) {

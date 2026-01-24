@@ -14,6 +14,7 @@ import { XSource } from "./fetcher/sources/XSource";
 import { logger } from "./external/logger";
 import { cache } from "./external/cache";
 import cors from "cors";
+import { triggerClientCacheRevalidation } from "./external/revalidateClient";
 
 // Inject env variables
 config();
@@ -83,12 +84,8 @@ app.get("/all", (req, res) => {
   aggregator.isRunning = true;
 
   logger.info("Aggregation started");
-  aggregator
-    .fetchContent()
-    .catch((err) => console.error(err))
-    .finally(() => {
-      aggregator.isRunning = false;
-    });
+  aggregator.fetchContent().catch((err) => logger.error(err));
+
   res.status(202).json({ message: "Aggregation started" });
 });
 

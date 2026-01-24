@@ -32,6 +32,8 @@ export default function FeedHeader({
   const router = useRouter();
   const [query, setQuery] = useState((params && params.toString()) || "");
 
+  console.log("sources client", sources);
+
   const [filterMutated, setFilterMutated] = useState(false);
 
   const [sortCriteria, setSortCriteria] = useState<FeedFilterSortCriteria>(
@@ -39,8 +41,9 @@ export default function FeedHeader({
   );
 
   const [selectedSources, setSelectedSources] = useState<Set<string>>(
-    new Set((params && params.sources?.split(",")) || []),
+    new Set((params && params.sources?.split(",").filter((el) => el)) || []),
   );
+
   const toggleSource = (source: string) => {
     const newSelected = new Set(selectedSources);
     if (newSelected.has(source)) {
@@ -61,8 +64,7 @@ export default function FeedHeader({
 
   const handleCategory = (category: FeedFilterSortCriteria) => {
     setSortCriteria(category);
-    setFilterMutated(true);
-    updateQueryString("category", category);
+    router.push("/filter" + "?category=" + category);
   };
 
   const updateQueryString = (name: string, value: string) => {
@@ -85,7 +87,7 @@ export default function FeedHeader({
               Feed
             </Link>
             <p className="text-sm text-muted-foreground mt-1">
-              {data.length} items from {selectedSources.size - 1} sources
+              {data.length} items from {sources.length} sources
             </p>
           </div>
 
@@ -94,7 +96,10 @@ export default function FeedHeader({
               <Button
                 variant={sortCriteria === "top" ? "secondary" : "ghost"}
                 size="sm"
-                onClick={() => handleCategory("top")}
+                onClick={() => {
+                  router.push("/filter" + "?category=top");
+                  handleCategory("top");
+                }}
                 className="text-xs h-8"
               >
                 <TrendingUp className="mr-1.5 h-3.5 w-3.5" />
@@ -103,7 +108,10 @@ export default function FeedHeader({
               <Button
                 variant={sortCriteria === "new" ? "secondary" : "ghost"}
                 size="sm"
-                onClick={() => handleCategory("new")}
+                onClick={() => {
+                  router.push("/filter" + "?category=new");
+                  handleCategory("new");
+                }}
                 className="text-xs h-8"
               >
                 <Clock className="mr-1.5 h-3.5 w-3.5" />
@@ -112,7 +120,7 @@ export default function FeedHeader({
             </div>
 
             {/* Filter Dropdown */}
-            <DropdownMenu>
+            {/* <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
@@ -126,7 +134,7 @@ export default function FeedHeader({
                       variant="secondary"
                       className="ml-1.5 rounded-full px-1.5 py-0 text-[10px]"
                     >
-                      {selectedSources.size - 1}
+                      {selectedSources.size}
                     </Badge>
                   )}
                 </Button>
@@ -168,7 +176,7 @@ export default function FeedHeader({
                 {filterMutated ? "Apply" : "Applied"}
                 <MoveRight className="mr-1.5 h-3.5 w-3.5" />
               </Button>
-            )}
+            )} */}
           </div>
         </div>
       </div>

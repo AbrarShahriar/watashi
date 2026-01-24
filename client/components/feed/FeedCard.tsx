@@ -46,7 +46,6 @@ function getSourceStyles(source: string): {
 export function FeedCard({ item }: FeedCardProps) {
   const styles = getSourceStyles(item.source);
   const isHot = item.score >= 80;
-  console.log(item);
 
   return (
     <Card className="group border-border/40 bg-card/30 hover:bg-card/60 hover:border-border/60 transition-all duration-200">

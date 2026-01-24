@@ -3,12 +3,24 @@ import { calculatePerformanceScore } from "@/lib/utils";
 import "server-only";
 
 export async function getFeedData() {
-  const res = await fetch(`${process.env.BACKEND_URL}/feed`);
-  const data = await res.json();
+  try {
+    const res = await fetch(`${process.env.BACKEND_URL}/feed`, {
+      next: {
+        revalidate: 3600,
+      },
+      headers: {
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      },
+    });
 
-  console.log("data", data.posts);
+    if (!res.ok) return [];
 
-  return normalizeFeedData(data);
+    const data = await res.json();
+
+    return normalizeFeedData(data);
+  } catch (error) {
+    return [];
+  }
 }
 
 // Normalize feed data from API response to unified FeedItem array

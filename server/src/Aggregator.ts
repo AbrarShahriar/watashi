@@ -1,5 +1,6 @@
 import { cache } from "./external/cache";
 import { logger } from "./external/logger";
+import { triggerClientCacheRevalidation } from "./external/revalidateClient";
 import { SourceBase } from "./fetcher/SourceBase";
 import { Post } from "./types";
 
@@ -40,7 +41,13 @@ export class Aggregator {
       logger.info(`Caching successful`);
     } catch (error) {
       logger.error(`Caching failed: ${error}`);
+    } finally {
+      await this.triggerRevalidate();
     }
     return posts;
+  }
+
+  async triggerRevalidate() {
+    await triggerClientCacheRevalidation();
   }
 }

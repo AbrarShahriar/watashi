@@ -1,3 +1,4 @@
+import EmptyFeed from "@/components/feed/EmptyFeed";
 import { FeedCard } from "@/components/feed/FeedCard";
 import FeedHeader from "@/components/feed/FeedHeader";
 import { getFeedData } from "@/data/feed-dto";
@@ -43,11 +44,15 @@ export default async function Filter({
       </Suspense>
       {/* Feed */}
       <main className="mx-auto max-w-3xl px-4 py-6">
-        {sortedFeed && sortedFeed.length > 0 && (
+        {sortedFeed && sortedFeed.length > 0 ? (
           <div className="space-y-3">
             {sortedFeed.map((item) => (
               <FeedCard key={item.id} item={item} />
             ))}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <EmptyFeed />
           </div>
         )}
       </main>
