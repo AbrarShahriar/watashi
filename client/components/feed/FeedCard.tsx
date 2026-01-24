@@ -97,16 +97,16 @@ export function FeedCard({ item }: FeedCardProps) {
           <div className="flex items-center justify-between pt-1">
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
               {item.author && (
-                <span className="truncate max-w-[120px]">by {item.author}</span>
+                <span className="truncate max-w-30">by {item.author}</span>
               )}
             </div>
             <div
               className={`flex items-center gap-1 text-xs text-muted-foreground/60 group-hover:${styles.accent} transition-colors`}
             >
-              <span className="truncate max-w-[100px] hidden sm:inline">
+              <span className="truncate max-w-25 hidden sm:inline">
                 {formatURL(item.url)}
               </span>
-              <ExternalLink className="h-3 w-3 flex-shrink-0" />
+              <ExternalLink className="h-3 w-3 shrink-0" />
             </div>
           </div>
         </div>
