@@ -44,6 +44,7 @@ export default function tldrExtractor(html: string): Post[] {
       author: "TLDR",
       createdAt: Date.now().toString(),
       metadata: { score: 100 },
+      score: 100,
       id: Math.random().toString(),
       media: null,
     });
