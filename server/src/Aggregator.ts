@@ -43,6 +43,7 @@ export class Aggregator {
       logger.error(`Caching failed: ${error}`);
     } finally {
       await this.triggerRevalidate();
+      this.isRunning = false;
     }
     return posts;
   }

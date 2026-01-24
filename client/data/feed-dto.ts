@@ -1,5 +1,4 @@
 import { FeedData, FeedItem } from "@/lib/types";
-import { calculatePerformanceScore } from "@/lib/utils";
 import "server-only";
 
 export async function getFeedData() {
