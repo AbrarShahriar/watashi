@@ -66,49 +66,24 @@ export function normalizeFeedData(data: FeedData): FeedItem[] {
   //   })
   // })
 
-  data.posts?.hackernews?.forEach((hn) => {
-    items.push({
-      id: hn.id,
-      title: hn.title,
-      url: hn.url,
-      description: hn.description || "",
-      source: hn.source,
-      score: calculatePerformanceScore(hn.metadata, hn.createdAt),
-      createdAt: hn.createdAt,
-      author: hn.author,
-      media: null,
-    });
-  });
+  const sources = Object.keys(data.posts!);
 
-  data.posts?.reddit?.forEach((reddit) => {
-    items.push({
-      id: reddit.id,
-      title: reddit.title,
-      url: reddit.url.startsWith("http")
-        ? reddit.url
-        : `https://reddit.com${reddit.url}`,
-      description: reddit.description || "",
-      source: `r/${reddit.source}`,
-      createdAt: reddit.createdAt,
-      author: reddit.author,
-      score: calculatePerformanceScore(reddit.metadata, reddit.createdAt),
-      media: reddit.media,
-    });
-  });
-
-  data.posts?.x?.forEach((xPost) => {
-    items.push({
-      id: xPost.id,
-      title: xPost.title,
-      url: xPost.url,
-      description: xPost.description,
-      source: "X",
-      createdAt: xPost.createdAt,
-      author: xPost.author,
-      score: calculatePerformanceScore(xPost.metadata, xPost.createdAt),
-      media: null,
-    });
-  });
+  for (const sourceName of sources) {
+    const currentSource = data.posts![sourceName];
+    for (const currentItem of currentSource) {
+      items.push({
+        id: currentItem.id,
+        title: currentItem.title,
+        url: currentItem.url,
+        description: currentItem.description || "",
+        source: currentItem.source,
+        score: currentItem.score,
+        createdAt: currentItem.createdAt,
+        author: currentItem.author,
+        media: currentItem.media,
+      });
+    }
+  }
 
   return items;
 }

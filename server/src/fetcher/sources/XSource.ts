@@ -1,4 +1,4 @@
-import { Post, XPost } from "../../types";
+import { Post } from "../../types";
 import { SourceBase } from "../SourceBase";
 
 type XUser = {
@@ -93,8 +93,8 @@ export class XSource extends SourceBase {
     return posts;
   }
 
-  parseContent(rawData: XRawItem[][], metadata: { user: XUser }): XPost[] {
-    const parsedPostsMap = new Map<string, XPost>();
+  parseContent(rawData: XRawItem[][], metadata: { user: XUser }): Post[] {
+    const parsedPostsMap = new Map<string, Post>();
 
     for (let i = 0; i < rawData.length; i++) {
       for (let j = 0; j < rawData[i].length; j++) {
@@ -121,6 +121,12 @@ export class XSource extends SourceBase {
                 metadata: {
                   numOfComments: parseInt(currentItem.commentcount),
                 },
+                score: this.calculatePerformanceScore(
+                  {
+                    numOfComments: parseInt(currentItem.commentcount),
+                  },
+                  currentItem.datepublished,
+                ),
                 media: null,
               });
             }

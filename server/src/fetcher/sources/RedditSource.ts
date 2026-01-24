@@ -1,4 +1,4 @@
-import { Post, RedditPost } from "../../types";
+import { Post } from "../../types";
 import { SourceBase } from "../SourceBase";
 
 type RedditRaw = {
@@ -83,8 +83,8 @@ export class RedditSource extends SourceBase {
     return posts;
   }
 
-  parseContent(rawData: RedditRaw[]): RedditPost[] {
-    const posts: RedditPost[] = [];
+  parseContent(rawData: RedditRaw[]): Post[] {
+    const posts: Post[] = [];
 
     rawData
       .filter((entry) => entry.stickied == false)
@@ -100,17 +100,19 @@ export class RedditSource extends SourceBase {
 
         posts.push({
           id: post.id,
-          url: post.url,
+          url: post.url.startsWith("http")
+            ? post.url
+            : `https://reddit.com${post.url}`,
           title: post.title,
           description: post.selftext,
-          source: post.subreddit,
+          source: `r/${post.subreddit}`,
           author: post.author_fullname,
           createdAt: post.created_utc * 1000,
-          metadata: {
-            score: post.score,
-            ups: post.ups,
-            downs: -post.downs,
-          },
+          score: this.calculatePerformanceScore(
+            { score: post.score, ups: post.ups, downs: -post.downs },
+            post.created_utc * 1000,
+          ),
+          metadata: { score: post.score, ups: post.ups, downs: -post.downs },
           media,
         });
       });

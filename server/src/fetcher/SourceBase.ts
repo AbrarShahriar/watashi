@@ -51,6 +51,29 @@ export abstract class SourceBase implements ISourceBase {
     }
   }
 
+  public calculatePerformanceScore(
+    metadata: Record<string, unknown>,
+    createdAt: string | number,
+  ): number {
+    const now = Date.now();
+    const itemDate = new Date(createdAt).getTime();
+    const hoursSincePost = (now - itemDate) / (1000 * 60 * 60);
+    let recency = hoursSincePost % 24;
+
+    const keys = Object.keys(metadata);
+    let sum = 0;
+    let factor = 1;
+    for (const key of keys) {
+      sum += parseInt(metadata[key] as string) * factor;
+      factor -= 0.25;
+    }
+
+    if (hoursSincePost > 48) {
+      recency *= -1;
+    }
+    return Math.min(100, (sum % 100) + recency);
+  }
+
   public abstract fetchContent(topic?: string): Promise<Post[]>;
   public abstract parseContent(rawData: unknown[], metadata?: unknown): Post[];
   public abstract healthCheck(): Promise<boolean>;

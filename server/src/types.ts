@@ -6,20 +6,9 @@ export type Post = {
   author: string;
   createdAt: string | number;
   url: string;
+  score: number;
   metadata: Record<string, unknown>;
   media: string | null;
-};
-
-export type RedditPost = Post & {
-  metadata: { ups: number; downs: number; score: number };
-};
-
-export type HNPost = Post & {
-  metadata: { numOfComments: number; points: number };
-};
-
-export type XPost = Post & {
-  metadata: { numOfComments: number };
 };
 
 export type EmailType = {
