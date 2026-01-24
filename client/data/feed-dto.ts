@@ -4,14 +4,7 @@ import "server-only";
 
 export async function getFeedData() {
   try {
-    const res = await fetch(`${process.env.BACKEND_URL}/feed`, {
-      next: {
-        revalidate: 3600,
-      },
-      headers: {
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
-      },
-    });
+    const res = await getData();
 
     if (!res.ok) return [];
 
@@ -23,7 +16,31 @@ export async function getFeedData() {
   }
 }
 
-// Normalize feed data from API response to unified FeedItem array
+async function getData() {
+  return await fetch(`${process.env.BACKEND_URL}/feed`, {
+    next: {
+      revalidate: 3600,
+    },
+    headers: {
+      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+    },
+  });
+}
+
+export async function getLastUpdateTime() {
+  try {
+    const res = await getData();
+
+    if (!res.ok) return 0;
+
+    const data = await res.json();
+
+    return data.lastUpdated;
+  } catch (error) {
+    return 0;
+  }
+}
+
 export function normalizeFeedData(data: FeedData): FeedItem[] {
   const items: FeedItem[] = [];
 

@@ -1,24 +1,17 @@
 "use client";
 
 import { FeedFilterSortCriteria, FeedItem } from "@/lib/types";
-import { TrendingUp, Clock, Filter, MoveRight } from "lucide-react";
+import { TrendingUp, Clock } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { Badge } from "../ui/badge";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { formatRelativeTime } from "@/lib/utils";
 
 interface Props {
   data: FeedItem[];
   sources: string[];
+  lastUpdated: number;
   searchParams?: {
     category?: FeedFilterSortCriteria;
     sources?: string;
@@ -28,54 +21,50 @@ export default function FeedHeader({
   data,
   sources,
   searchParams: params,
+  lastUpdated,
 }: Props) {
   const router = useRouter();
-  const [query, setQuery] = useState((params && params.toString()) || "");
-
-  console.log("sources client", sources);
-
-  const [filterMutated, setFilterMutated] = useState(false);
 
   const [sortCriteria, setSortCriteria] = useState<FeedFilterSortCriteria>(
     (params && (params.category as FeedFilterSortCriteria)) || "top",
   );
 
-  const [selectedSources, setSelectedSources] = useState<Set<string>>(
-    new Set((params && params.sources?.split(",").filter((el) => el)) || []),
-  );
+  // const [query, setQuery] = useState((params && params.toString()) || "");
+  // const [selectedSources, setSelectedSources] = useState<Set<string>>(
+  //   new Set((params && params.sources?.split(",").filter((el) => el)) || []),
+  // );
+  // const [filterMutated, setFilterMutated] = useState(false);
+  // const toggleSource = (source: string) => {
+  //   const newSelected = new Set(selectedSources);
+  //   if (newSelected.has(source)) {
+  //     newSelected.delete(source);
+  //   } else {
+  //     newSelected.add(source);
+  //   }
+  //   setFilterMutated(true);
+  //   setSelectedSources(newSelected);
+  //   updateQueryString("sources", setToStr(newSelected));
+  // };
+  // const setToStr = (set: Set<string>) => {
+  //   let res = "";
+  //   set.forEach((item) => (res += item + ","));
+  //   res.slice(0, res.length - 2);
+  //   return res;
+  // };
+  // const updateQueryString = (name: string, value: string) => {
+  //   const newParams = new URLSearchParams(query);
+  //   newParams.set(name, value);
+  //   setQuery(newParams.toString());
+  // };
 
-  const toggleSource = (source: string) => {
-    const newSelected = new Set(selectedSources);
-    if (newSelected.has(source)) {
-      newSelected.delete(source);
-    } else {
-      newSelected.add(source);
-    }
-    setFilterMutated(true);
-    setSelectedSources(newSelected);
-    updateQueryString("sources", setToStr(newSelected));
-  };
-  const setToStr = (set: Set<string>) => {
-    let res = "";
-    set.forEach((item) => (res += item + ","));
-    res.slice(0, res.length - 2);
-    return res;
-  };
+  // const handleApply = () => {
+  //   setFilterMutated(false);
+  //   router.push("/filter" + "?" + query);
+  // };
 
   const handleCategory = (category: FeedFilterSortCriteria) => {
     setSortCriteria(category);
     router.push("/filter" + "?category=" + category);
-  };
-
-  const updateQueryString = (name: string, value: string) => {
-    const newParams = new URLSearchParams(query);
-    newParams.set(name, value);
-    setQuery(newParams.toString());
-  };
-
-  const handleApply = () => {
-    setFilterMutated(false);
-    router.push("/filter" + "?" + query);
   };
 
   return (
@@ -83,11 +72,14 @@ export default function FeedHeader({
       <div className="mx-auto max-w-3xl px-4 py-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <Link href={"/"} className="text-2xl font-bold tracking-tight">
+            <Link href={"/"} className="text-2xl font-bold tracking-tight mr-4">
               Feed
             </Link>
             <p className="text-sm text-muted-foreground mt-1">
-              {data.length} items from {sources.length} sources
+              {data.length} items from {sources.length} sources collected{" "}
+              <span className="text-amber-600 lowercase">
+                {formatRelativeTime(lastUpdated)}
+              </span>
             </p>
           </div>
 

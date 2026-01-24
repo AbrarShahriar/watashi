@@ -1,7 +1,7 @@
 import EmptyFeed from "@/components/feed/EmptyFeed";
 import { FeedCard } from "@/components/feed/FeedCard";
 import FeedHeader from "@/components/feed/FeedHeader";
-import { getFeedData } from "@/data/feed-dto";
+import { getFeedData, getLastUpdateTime } from "@/data/feed-dto";
 import { FeedFilterSortCriteria } from "@/lib/types";
 import { generateSourcesFromData, sortBy } from "@/lib/utils";
 import { Suspense } from "react";
@@ -13,6 +13,7 @@ export default async function Filter({
 }) {
   const { sources, category } = await searchParams;
   const feedData = await getFeedData();
+  const lastUpdated = await getLastUpdateTime();
   const uniqSources = generateSourcesFromData(feedData);
 
   const sortByCriteria = category;
@@ -36,6 +37,7 @@ export default async function Filter({
         <FeedHeader
           sources={uniqSources}
           data={sortedFeed}
+          lastUpdated={lastUpdated}
           searchParams={{
             category,
             sources,

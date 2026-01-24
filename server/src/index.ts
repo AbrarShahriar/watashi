@@ -63,12 +63,14 @@ app.get("/", async (req, res) => {
 app.get("/feed", async (req, res) => {
   let posts = await cache.get();
   let emails = await emailHandler.getEmailsFromFile();
-  if (!posts || !posts.data) posts = { data: [], lastUpdated: "-1" };
   if (!emails) emails = [];
+
+  const lastUpdated = await aggregator.lastRun();
 
   const feed = {
     emails,
-    posts: posts.data,
+    posts,
+    lastUpdated,
   };
 
   res.status(200).json(feed);

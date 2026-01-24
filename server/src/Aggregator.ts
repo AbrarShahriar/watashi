@@ -50,4 +50,13 @@ export class Aggregator {
   async triggerRevalidate() {
     await triggerClientCacheRevalidation();
   }
+
+  async lastRun() {
+    try {
+      const time = await cache.getLastCacheUpdate();
+      return parseInt(time);
+    } catch (error) {
+      return 0;
+    }
+  }
 }

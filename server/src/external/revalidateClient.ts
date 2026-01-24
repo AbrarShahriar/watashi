@@ -9,8 +9,8 @@ export async function triggerClientCacheRevalidation() {
       },
     });
 
-    logger.info("Revalidation Successful:", response.status);
+    logger.info("Revalidation Successful: " + response.status);
   } catch (error) {
-    logger.error("Revalidation Failed:", error);
+    logger.error("Revalidation Failed: " + error);
   }
 }
