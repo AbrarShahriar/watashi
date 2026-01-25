@@ -14,7 +14,6 @@ import { XSource } from "./fetcher/sources/XSource";
 import { logger } from "./external/logger";
 import { cache } from "./external/cache";
 import cors from "cors";
-import { triggerClientCacheRevalidation } from "./external/revalidateClient";
 
 // Inject env variables
 config();
@@ -32,8 +31,8 @@ aggregator.addSource(
   new XSource({
     users: Sources.xUsers,
     auth: {
-      gSearchCx: process.env.GOOGLE_SEARCH_CX as string,
-      gSearchKey: process.env.GOOGLE_SEARCH_KEY as string,
+      gSearchCx: process.env.GOOGLE_SEARCH_CX!,
+      gSearchKey: process.env.GOOGLE_SEARCH_KEY!,
     },
   }),
 );
@@ -49,7 +48,7 @@ app.use(compression());
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: process.env.CORS_ORIGIN!,
   }),
 );
 
@@ -205,5 +204,5 @@ app.get("/watch-renew", async (req, res) => {
 app.listen(5000, async (err) => {
   if (err) logger.error(err);
   logger.info("Server started at 5000");
-  await emailHandler.loadPrevMails();
+  // await emailHandler.loadPrevMails();
 });

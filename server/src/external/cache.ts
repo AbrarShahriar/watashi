@@ -14,18 +14,10 @@ class Cache {
   }
 
   async get(): Promise<Record<string, Post[]> | null> {
-    let time: string | number = 0;
-    try {
-      time = await fs.readFile(`${this.path}/timestamp.txt`, {
-        encoding: "utf-8",
-      });
-    } catch (error) {
-      time = new Date().getTime();
-    }
-
     // Check in-memory cache
     if (this.data) return this.data;
 
+    // Check disk
     if (this.data == null) {
       try {
         let fileData = "{}";
