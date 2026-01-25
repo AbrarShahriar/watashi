@@ -19,9 +19,7 @@ async function getData() {
   return await fetch(`${process.env.BACKEND_URL}/feed`, {
     next: {
       revalidate: 3600,
-    },
-    headers: {
-      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      tags: ["feed-data"],
     },
   });
 }

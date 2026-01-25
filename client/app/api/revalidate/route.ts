@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   console.log("Home page revalidation triggered");
 
   try {
-    revalidatePath("/");
+    revalidateTag("feed-data", { expire: 0 });
 
     return NextResponse.json({
       revalidated: true,
