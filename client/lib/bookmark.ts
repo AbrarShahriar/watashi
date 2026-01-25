@@ -4,7 +4,7 @@ type Listener = () => void;
 
 export class Bookmark {
   private static readonly BOOKMARKS_KEY = "feed-bookmarks";
-  private static bookmarks: Post[] = [];
+  private static bookmarks: Post[] | null = null;
   private static listeners: Listener[] = [];
   private static SSRDefault: Post[] = [];
 
@@ -20,14 +20,21 @@ export class Bookmark {
   }
 
   public static getBookmarks(): Post[] {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem(this.BOOKMARKS_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as Post[];
-        this.bookmarks.splice(0, this.bookmarks.length);
-        this.bookmarks.push(...parsed);
-      }
+    if (typeof window === "undefined") return [];
+
+    if (this.bookmarks !== null) {
+      return this.bookmarks;
     }
+    try {
+      const stored = localStorage.getItem(this.BOOKMARKS_KEY);
+      // const parsed = JSON.parse(stored) as Post[];
+      this.bookmarks = stored ? (JSON.parse(stored) as Post[]) : [];
+      // this.bookmarks.splice(0, this.bookmarks.length);
+      // this.bookmarks.push(...parsed);
+    } catch (error) {
+      this.bookmarks = [];
+    }
+
     return this.bookmarks;
   }
 

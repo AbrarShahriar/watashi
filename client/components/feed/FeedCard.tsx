@@ -7,8 +7,9 @@ import { FeedItem } from "@/lib/types";
 import { formatRelativeTime, formatURL } from "@/lib/utils";
 import Image from "next/image";
 import { Button } from "../ui/button";
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Bookmark } from "@/lib/bookmark";
+import ClientOnly from "../shared/ClientOnly";
 
 interface FeedCardProps {
   item: FeedItem;
@@ -79,27 +80,29 @@ export function FeedCard({ item }: FeedCardProps) {
             <span className="text-xs text-muted-foreground">
               {formatRelativeTime(item.createdAt)}
             </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`h-8 w-8 cursor-pointer ${
-                itemBookmarked
-                  ? "text-amber-400 hover:text-amber-500"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                Bookmark.toggleBookmark(item);
-              }}
-            >
-              <BookmarkIcon
-                className={`h-4 w-4 ${itemBookmarked ? "fill-current" : ""}`}
-              />
-              <span className="sr-only">
-                {itemBookmarked ? "Remove bookmark" : "Add bookmark"}
-              </span>
-            </Button>
+            <ClientOnly>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`h-8 w-8 cursor-pointer ${
+                  itemBookmarked
+                    ? "text-amber-400 hover:text-amber-500"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  Bookmark.toggleBookmark(item);
+                }}
+              >
+                <BookmarkIcon
+                  className={`h-4 w-4 ${itemBookmarked ? "fill-current" : ""}`}
+                />
+                <span className="sr-only">
+                  {itemBookmarked ? "Remove bookmark" : "Add bookmark"}
+                </span>
+              </Button>
+            </ClientOnly>
           </div>
 
           {item.media && (
