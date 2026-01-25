@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader, LoaderCircle } from "lucide-react";
 import { useEffect, useEffectEvent, useState } from "react";
 
 export default function ClientOnly({
@@ -17,7 +18,7 @@ export default function ClientOnly({
     handleMountedChange(true);
   }, []);
 
-  if (!hasMounted) return null;
+  if (!hasMounted) return <LoaderCircle size={20} className="animate-spin" />;
 
   return <>{children}</>;
 }

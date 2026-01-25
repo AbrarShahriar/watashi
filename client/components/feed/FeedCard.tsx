@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 import { useMemo, useSyncExternalStore } from "react";
 import { Bookmark } from "@/lib/bookmark";
 import ClientOnly from "../shared/ClientOnly";
+import BookmarkButton from "./BookmarkButton";
 
 interface FeedCardProps {
   item: FeedItem;
@@ -50,12 +51,6 @@ function getSourceStyles(source: string): {
 export function FeedCard({ item }: FeedCardProps) {
   const styles = useMemo(() => getSourceStyles(item.source), [item.source]);
 
-  const itemBookmarked = useSyncExternalStore(
-    (callback) => Bookmark.subscribe(callback),
-    () => Bookmark.isBookmarked(item),
-    () => false,
-  );
-
   return (
     <Card className="group border-border/40 bg-card/30 hover:bg-card/60 hover:border-border/60 transition-all duration-200">
       <a
@@ -82,27 +77,7 @@ export function FeedCard({ item }: FeedCardProps) {
               {formatRelativeTime(item.createdAt)}
             </span>
             <ClientOnly>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={`h-8 w-8 cursor-pointer ${
-                  itemBookmarked
-                    ? "text-amber-400 hover:text-amber-500"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  Bookmark.toggleBookmark(item);
-                }}
-              >
-                <BookmarkIcon
-                  className={`h-4 w-4 ${itemBookmarked ? "fill-current" : ""}`}
-                />
-                <span className="sr-only">
-                  {itemBookmarked ? "Remove bookmark" : "Add bookmark"}
-                </span>
-              </Button>
+              <BookmarkButton item={item} />
             </ClientOnly>
           </div>
 
