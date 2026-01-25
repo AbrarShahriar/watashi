@@ -4,7 +4,6 @@ import FeedHeader from "./FeedHeader";
 import { generateSourcesFromData, sortBy } from "@/lib/utils";
 import { Suspense } from "react";
 import EmptyFeed from "./EmptyFeed";
-import ClientOnly from "../shared/ClientOnly";
 
 export default async function FeedPage() {
   const feedData = await getFeedData();
@@ -24,19 +23,17 @@ export default async function FeedPage() {
 
       {/* Feed */}
       <main className="mx-auto max-w-3xl px-4 py-6">
-        <ClientOnly>
-          {sortedFeed && sortedFeed.length > 0 ? (
-            <div className="space-y-3">
-              {sortedFeed.map((item) => (
-                <FeedCard key={item.id} item={item} />
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <EmptyFeed />
-            </div>
-          )}
-        </ClientOnly>
+        {sortedFeed && sortedFeed.length > 0 ? (
+          <div className="space-y-3">
+            {sortedFeed.map((item) => (
+              <FeedCard key={item.id} item={item} />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <EmptyFeed />
+          </div>
+        )}
       </main>
     </div>
   );

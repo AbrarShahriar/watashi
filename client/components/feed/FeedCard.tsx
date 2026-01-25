@@ -7,7 +7,7 @@ import { FeedItem } from "@/lib/types";
 import { formatRelativeTime, formatURL } from "@/lib/utils";
 import Image from "next/image";
 import { Button } from "../ui/button";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { Bookmark } from "@/lib/bookmark";
 import ClientOnly from "../shared/ClientOnly";
 
@@ -48,8 +48,7 @@ function getSourceStyles(source: string): {
 }
 
 export function FeedCard({ item }: FeedCardProps) {
-  const styles = getSourceStyles(item.source);
-  const isHot = item.score >= 80;
+  const styles = useMemo(() => getSourceStyles(item.source), [item.source]);
 
   const itemBookmarked = useSyncExternalStore(
     (callback) => Bookmark.subscribe(callback),
@@ -75,7 +74,9 @@ export function FeedCard({ item }: FeedCardProps) {
               >
                 {item.source}
               </Badge>
-              {isHot && <Flame className="h-3.5 w-3.5 text-orange-400" />}
+              {item.score >= 80 && (
+                <Flame className="h-3.5 w-3.5 text-orange-400" />
+              )}
             </div>
             <span className="text-xs text-muted-foreground">
               {formatRelativeTime(item.createdAt)}
