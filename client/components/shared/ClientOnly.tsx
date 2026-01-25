@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+"use client";
+
+import { useEffect, useEffectEvent, useState } from "react";
 
 export default function ClientOnly({
   children,
@@ -7,9 +9,12 @@ export default function ClientOnly({
 }) {
   const [hasMounted, setHasMounted] = useState(false);
 
+  const handleMountedChange = useEffectEvent((val: boolean) => {
+    setHasMounted(val);
+  });
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHasMounted(true);
+    handleMountedChange(true);
   }, []);
 
   if (!hasMounted) return null;

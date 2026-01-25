@@ -58,9 +58,7 @@ export class Bookmark {
   }
 
   public static isBookmarked(post: Post): boolean {
-    return this.getBookmarks().findIndex((item) => item.id == post.id) == -1
-      ? false
-      : true;
+    return this.getBookmarks().some((item) => item.id == post.id);
   }
 
   public static clearBookmarks(): void {

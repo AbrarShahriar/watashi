@@ -2,6 +2,7 @@
 
 import EmptyFeed from "@/components/feed/EmptyFeed";
 import { FeedCard } from "@/components/feed/FeedCard";
+import ClientOnly from "@/components/shared/ClientOnly";
 import { Button } from "@/components/ui/button";
 import { Bookmark } from "@/lib/bookmark";
 import { ArrowLeft } from "lucide-react";
@@ -41,14 +42,16 @@ export default function BookmarksPage() {
           </Button>
 
           {feedData.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => Bookmark.clearBookmarks()}
-              className="text-muted-foreground hover:text-destructive"
-            >
-              Clear all ({feedData.length})
-            </Button>
+            <ClientOnly>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => Bookmark.clearBookmarks()}
+                className="text-muted-foreground hover:text-destructive"
+              >
+                Clear all ({feedData.length})
+              </Button>
+            </ClientOnly>
           )}
         </div>
         {feedData && feedData.length > 0 ? (
