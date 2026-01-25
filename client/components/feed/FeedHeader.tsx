@@ -1,7 +1,7 @@
 "use client";
 
 import { FeedFilterSortCriteria, FeedItem } from "@/lib/types";
-import { TrendingUp, Clock } from "lucide-react";
+import { TrendingUp, Clock, Bookmark } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -110,6 +110,14 @@ export default function FeedHeader({
                 New
               </Button>
             </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push("/bookmarks")}
+              className="bg-transparent cursor-pointer"
+            >
+              <Bookmark />
+            </Button>
 
             {/* Filter Dropdown */}
             {/* <DropdownMenu>

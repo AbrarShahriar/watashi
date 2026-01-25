@@ -2,10 +2,13 @@
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Flame } from "lucide-react";
+import { Bookmark as BookmarkIcon, ExternalLink, Flame } from "lucide-react";
 import { FeedItem } from "@/lib/types";
 import { formatRelativeTime, formatURL } from "@/lib/utils";
 import Image from "next/image";
+import { Button } from "../ui/button";
+import { useSyncExternalStore } from "react";
+import { Bookmark } from "@/lib/bookmark";
 
 interface FeedCardProps {
   item: FeedItem;
@@ -47,6 +50,12 @@ export function FeedCard({ item }: FeedCardProps) {
   const styles = getSourceStyles(item.source);
   const isHot = item.score >= 80;
 
+  const itemBookmarked = useSyncExternalStore(
+    (callback) => Bookmark.subscribe(callback),
+    () => Bookmark.isBookmarked(item),
+    () => false,
+  );
+
   return (
     <Card className="group border-border/40 bg-card/30 hover:bg-card/60 hover:border-border/60 transition-all duration-200">
       <a
@@ -56,9 +65,9 @@ export function FeedCard({ item }: FeedCardProps) {
         className="block px-5"
       >
         <div className="flex flex-col gap-2.5">
-          {/* Top row: Source badge + metadata */}
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
+          {/* Top row: Source badge + metadata + bookmark*/}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 mr-auto">
               <Badge
                 variant="outline"
                 className={`text-xs font-medium ${styles.badge}`}
@@ -70,6 +79,27 @@ export function FeedCard({ item }: FeedCardProps) {
             <span className="text-xs text-muted-foreground">
               {formatRelativeTime(item.createdAt)}
             </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`h-8 w-8 cursor-pointer ${
+                itemBookmarked
+                  ? "text-amber-400 hover:text-amber-500"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                Bookmark.toggleBookmark(item);
+              }}
+            >
+              <BookmarkIcon
+                className={`h-4 w-4 ${itemBookmarked ? "fill-current" : ""}`}
+              />
+              <span className="sr-only">
+                {itemBookmarked ? "Remove bookmark" : "Add bookmark"}
+              </span>
+            </Button>
           </div>
 
           {item.media && (
