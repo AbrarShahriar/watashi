@@ -21,23 +21,23 @@ config();
 
 // Aggregator
 const aggregator = new Aggregator();
-// aggregator.addSource(
-//   new RedditSource({
-//     subreddits: Sources.subreddits,
-//     redditWorkerUrl: process.env.REDDIT_URL!,
-//   }),
-// );
-// aggregator.addSource(new HackerNewsSource());
+aggregator.addSource(
+  new RedditSource({
+    subreddits: Sources.subreddits,
+    redditWorkerUrl: process.env.REDDIT_URL!,
+  }),
+);
+aggregator.addSource(new HackerNewsSource());
 aggregator.addSource(new TheNewStackSource());
-// aggregator.addSource(
-//   new XSource({
-//     users: Sources.xUsers,
-//     auth: {
-//       gSearchCx: process.env.GOOGLE_SEARCH_CX!,
-//       gSearchKey: process.env.GOOGLE_SEARCH_KEY!,
-//     },
-//   }),
-// );
+aggregator.addSource(
+  new XSource({
+    users: Sources.xUsers,
+    auth: {
+      gSearchCx: process.env.GOOGLE_SEARCH_CX!,
+      gSearchKey: process.env.GOOGLE_SEARCH_KEY!,
+    },
+  }),
+);
 
 // Initiate singleton email handler
 const emailHandler = new EmailHandler();
