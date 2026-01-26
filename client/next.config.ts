@@ -5,15 +5,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "preview.redd.it",
+        hostname: "**",
         port: "",
-        pathname: "**",
-      },
-      {
-        protocol: "https",
-        hostname: "external-preview.redd.it",
-        port: "",
-        pathname: "**",
+        pathname: "/**",
       },
     ],
   },

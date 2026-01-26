@@ -43,6 +43,8 @@ class Cache {
   async set(newData: Record<string, Post[]>) {
     this.data = newData;
 
+    await this.createCacheFileIfNotFound();
+
     const prevDataRaw = await fs.readFile(`${this.path}/${this.filename}`, {
       encoding: "utf-8",
     });
@@ -62,8 +64,6 @@ class Cache {
       this.data = prevData;
     }
 
-    await this.createParentDirectoryIfNotFound();
-
     await fs.writeFile(
       `${this.path}/${this.filename}`,
       JSON.stringify(this.data),
@@ -76,8 +76,17 @@ class Cache {
   }
 
   private async createParentDirectoryIfNotFound() {
-    const folderExists = await directoryExists(`cache`);
+    const folderExists = await directoryExists(this.path);
     if (!folderExists) await fs.mkdir(this.path);
+  }
+
+  private async createCacheFileIfNotFound() {
+    await this.createParentDirectoryIfNotFound();
+    const fileExists = await directoryExists(`${this.path}/${this.filename}`);
+    if (!fileExists)
+      await fs.writeFile(`${this.path}/${this.filename}`, JSON.stringify({}), {
+        encoding: "utf-8",
+      });
   }
 
   public async getLastCacheUpdate() {

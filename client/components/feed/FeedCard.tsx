@@ -6,41 +6,10 @@ import { ExternalLink, Flame } from "lucide-react";
 import { FeedItem } from "@/lib/types";
 import { formatRelativeTime, formatURL } from "@/lib/utils";
 import Image from "next/image";
+import { getSourceStyles } from "@/lib/sourceStyle";
 
 interface FeedCardProps {
   item: FeedItem;
-}
-
-function getSourceStyles(source: string): {
-  badge: string;
-  accent: string;
-} {
-  if (source == "newsletter") {
-    return {
-      badge: "bg-violet-500/20 text-violet-400 border-violet-500/30",
-      accent: "text-violet-400",
-    };
-  } else if (source == "HN - Front Page") {
-    return {
-      badge: "bg-orange-500/20 text-orange-400 border-orange-500/30",
-      accent: "text-orange-400",
-    };
-  } else if (source.startsWith("r/")) {
-    return {
-      badge: "bg-red-500/20 text-red-400 border-red-500/30",
-      accent: "text-red-400",
-    };
-  } else if (source == "X") {
-    return {
-      badge: "bg-sky-500/20 text-sky-400 border-sky-500/30",
-      accent: "text-sky-400",
-    };
-  } else {
-    return {
-      badge: "bg-muted text-muted-foreground",
-      accent: "text-muted-foreground",
-    };
-  }
 }
 
 export function FeedCard({ item }: FeedCardProps) {
@@ -74,7 +43,7 @@ export function FeedCard({ item }: FeedCardProps) {
 
           {item.media && (
             <Image
-              className="rounded-xl"
+              className=" h-fit"
               width={1000}
               height={1000}
               alt={`Post by ${item.author}`}

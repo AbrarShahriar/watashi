@@ -75,6 +75,6 @@ export abstract class SourceBase implements ISourceBase {
   }
 
   public abstract fetchContent(topic?: string): Promise<Post[]>;
-  public abstract parseContent(rawData: unknown[], metadata?: unknown): Post[];
+  public abstract parseContent(rawData: unknown, metadata?: unknown): Post[];
   public abstract healthCheck(): Promise<boolean>;
 }
