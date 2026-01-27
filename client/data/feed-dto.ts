@@ -22,7 +22,7 @@ export async function getFeedData(opts?: Options) {
 
 async function getData(opts?: Options) {
   return await fetch(
-    `${process.env.BACKEND_URL}/feed?page=${opts?.page || 1}&limit=${opts?.limit || process.env.ITEM_PER_PAGE}`,
+    `${process.env.BACKEND_URL}/feed?page=${opts?.page || 1}&limit=${opts?.limit || process.env.ITEM_PER_PAGE || 5}`,
     {
       next: {
         tags: ["feed-data"],

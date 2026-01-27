@@ -1,8 +1,9 @@
 "use client";
 
 import { Button } from "../ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Ellipsis } from "lucide-react";
 import { useRouter } from "next/navigation";
+import React from "react";
 
 interface Props {
   currentPage: number;
@@ -16,11 +17,38 @@ export default function FeedPages({ currentPage, totalPages }: Props) {
     return null;
   }
 
+  console.log(totalPages);
+
   const createPageUrl = (page: number) => {
     const params = new URLSearchParams();
     if (page > 1) params.set("page", page.toString());
     const queryString = params.toString();
     return queryString ? `?${queryString}` : "/";
+  };
+
+  const createPageButtons = () => {
+    const buttons = [];
+    let start = currentPage - 2,
+      end = currentPage + 2;
+
+    if (start <= 0) start = 1;
+    if (end >= totalPages) end = totalPages;
+
+    for (let i = start; i <= end; i++) {
+      const pageNum = i;
+      buttons.push(
+        <Button
+          variant={pageNum == currentPage ? "secondary" : "ghost"}
+          size="sm"
+          className="w-8 h-8 p-0 cursor-pointer"
+          onClick={() => router.push(createPageUrl(pageNum))}
+        >
+          {pageNum}
+        </Button>,
+      );
+    }
+
+    return buttons;
   };
 
   return (
@@ -35,32 +63,18 @@ export default function FeedPages({ currentPage, totalPages }: Props) {
         <ChevronLeft className="mr-1 h-4 w-4" />
         Previous
       </Button>
-      <div className="flex items-center gap-2">
-        {/* Page numbers */}
-        {Array.from({ length: totalPages }, (_, i) => {
-          let pageNum: number;
-          if (totalPages <= 5) {
-            pageNum = i + 1;
-          } else if (currentPage <= 3) {
-            pageNum = i + 1;
-          } else if (currentPage >= totalPages - 2) {
-            pageNum = totalPages - 4 + i;
-          } else {
-            pageNum = currentPage - 2 + i;
-          }
 
-          return (
-            <Button
-              key={pageNum}
-              variant={pageNum == currentPage ? "secondary" : "ghost"}
-              size="sm"
-              className="w-8 h-8 p-0"
-              onClick={() => router.push(createPageUrl(pageNum))}
-            >
-              {pageNum}
-            </Button>
-          );
-        })}
+      {/* Page numbers */}
+      <div className="flex items-center gap-2">
+        {totalPages > 5 && currentPage >= 3 && (
+          <Ellipsis size={12} className="opacity-50 mr-2.5" />
+        )}
+        {createPageButtons().map((pageButton, i) => (
+          <React.Fragment key={i}>{pageButton}</React.Fragment>
+        ))}
+        {totalPages > 5 && !(currentPage + 2 >= totalPages) && (
+          <Ellipsis size={12} className="opacity-50 ml-2.5" />
+        )}
       </div>
 
       <Button
