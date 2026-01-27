@@ -18,7 +18,6 @@ export async function getFeedData() {
 async function getData() {
   return await fetch(`${process.env.BACKEND_URL}/feed`, {
     next: {
-      revalidate: 3600,
       tags: ["feed-data"],
     },
   });

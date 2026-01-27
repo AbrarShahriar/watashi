@@ -10,7 +10,11 @@ export async function GET(request: NextRequest) {
   console.log("Home page revalidation triggered");
 
   try {
+    // Trigger rebuild
     revalidateTag("feed-data", { expire: 0 });
+
+    // Ping to make sure new user sees updated data instead of stale data
+    fetch(`${process.env.BASE_URL}`, { method: "GET" });
 
     return NextResponse.json({
       revalidated: true,

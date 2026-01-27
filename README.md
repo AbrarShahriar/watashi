@@ -2,4 +2,5 @@ Daily Dev Digest
 
 Issues
 
-- Duplicate Posts
+- Scoring issue (the new stack ranks below)
+- In production, user sees cached data on first load
