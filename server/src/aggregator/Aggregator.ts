@@ -1,8 +1,8 @@
-import { cache } from "./external/cache";
-import { logger } from "./external/logger";
-import { triggerClientCacheRevalidation } from "./external/revalidateClient";
-import { SourceBase } from "./fetcher/SourceBase";
-import { Post } from "./types";
+import { triggerClientCacheRevalidation } from "../external/revalidateClient";
+import { logger } from "../infra/logger";
+import { SourceBase } from "../sources/SourceBase";
+import { cache } from "../storage/cache";
+import { Post } from "../types";
 
 export class Aggregator {
   public isRunning: boolean = false;
@@ -24,17 +24,17 @@ export class Aggregator {
     return this.failed;
   }
 
-  addSource(source: SourceBase) {
+  registerSource(source: SourceBase) {
     this.sources.push(source);
   }
 
-  async fetchContent(): Promise<Record<string, Post[]>> {
+  async run(): Promise<Record<string, Post[]>> {
     const posts: Record<string, Post[]> = {};
 
     for (const source of this.sources) {
       logger.info(`Starting Aggregation for source: ${source.id}`);
       try {
-        const content = await source.fetchContent();
+        const content = await source.run();
         logger.info(
           `✅ Successfully fetched ${content.length} items from ${source.id}`,
         );

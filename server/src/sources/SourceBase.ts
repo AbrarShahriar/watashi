@@ -1,8 +1,8 @@
 import winston from "winston";
-import { logger } from "../external/logger";
+import { logger } from "../infra/logger";
 import { Post } from "../types";
-import { CircuitBreaker } from "./CircuitBreaker";
-import { Retry } from "./Retry";
+import { CircuitBreaker } from "../infra/CircuitBreaker";
+import { Retry } from "../infra/Retry";
 
 export interface ISourceBase {
   readonly id: string;
@@ -12,7 +12,7 @@ export interface ISourceBase {
    * @param topic Optional topic to filter content
    * @returns Promise with array of content items
    */
-  fetchContent(topic?: string): Promise<Post[]>;
+  run(topic?: string): Promise<Post[]>;
 
   /**
    * Check if the source is healthy/available
@@ -74,7 +74,7 @@ export abstract class SourceBase implements ISourceBase {
     return Math.min(100, (sum % 100) + recency);
   }
 
-  public abstract fetchContent(topic?: string): Promise<Post[]>;
+  public abstract run(topic?: string): Promise<Post[]>;
   public abstract parseContent(rawData: unknown, metadata?: unknown): Post[];
   public abstract healthCheck(): Promise<boolean>;
 }

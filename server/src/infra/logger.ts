@@ -4,10 +4,10 @@ import path from "path";
 
 const logDir = path.join(process.cwd(), "logs");
 
-const { combine, timestamp, errors, printf, json, colorize } = winston.format;
+const { combine, timestamp, errors, printf, colorize } = winston.format;
 
 /**
- * Custom log format (readable + structured)
+ * Custom log format
  */
 const logFormat = printf(({ level, message, timestamp, stack, ...meta }) => {
   return `${timestamp} [${level}]: ${stack || message} ${
@@ -51,7 +51,7 @@ export const logger = winston.createLogger({
 });
 
 /**
- * Console logging (only in dev)
+ * Console logging
  */
 if (process.env.NODE_ENV !== "production") {
   logger.add(

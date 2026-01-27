@@ -1,58 +1,18 @@
 import { Post } from "../../types";
 import { SourceBase } from "../SourceBase";
-
-type RedditRaw = {
-  id: string;
-  title: string;
-  selftext: string;
-  subreddit: string;
-  author_fullname: string;
-  created_utc: number;
-  url: string;
-  ups: number;
-  downs: number;
-  score: number;
-  stickied: boolean;
-  is_gallery?: boolean;
-  media_metadata?: {
-    [key: string]: {
-      s: {
-        y: number;
-        x: number;
-        u: string;
-      };
-    };
-  };
-  preview?: {
-    images: {
-      source: {
-        url: string;
-        width: number;
-        height: number;
-        resolutions: {
-          url: string;
-          width: number;
-          height: number;
-        }[];
-      };
-    }[];
-  };
-};
+import redditConfig, { Config, RedditConfig } from "./reddit.config";
+import { RedditRaw } from "./reddit.types";
 
 export class RedditSource extends SourceBase {
   readonly id = "reddit";
 
-  constructor(
-    public config: { subreddits: string[]; redditWorkerUrl: string },
-  ) {
+  constructor(public config: RedditConfig = redditConfig) {
     super(config);
-    this.config = config;
   }
 
   public async fetchSingle(subreddit: string): Promise<Post[]> {
-    const res = await fetch(
-      `${this.config.redditWorkerUrl}?subreddit=${subreddit}&category=hot&limit=5`,
-    );
+    const url = this.config.getUrl({ subreddit });
+    const res = await fetch(url);
 
     if (!res.ok) {
       throw new Error(
@@ -69,7 +29,7 @@ export class RedditSource extends SourceBase {
     return this.parseContent(rawPosts);
   }
 
-  public async fetchContent(): Promise<Post[]> {
+  public async run(): Promise<Post[]> {
     const posts: Post[] = [];
 
     for (const subreddit of this.config.subreddits) {

@@ -1,4 +1,4 @@
-import { logger } from "./logger";
+import { logger } from "../infra/logger";
 
 export async function triggerClientCacheRevalidation() {
   try {

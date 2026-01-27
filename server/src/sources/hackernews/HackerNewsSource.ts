@@ -1,33 +1,22 @@
 import { Post } from "../../types";
 import { SourceBase } from "../SourceBase";
-
-type HNRaw = {
-  title: string;
-  author: string;
-  created_at: string;
-  url: string;
-  num_comments: number;
-  points: number;
-  objectID: string;
-};
+import hackernewsConfig, { HackerNewsConfig } from "./hackernews.config";
+import { HNRaw } from "./hackernews.types";
 
 export class HackerNewsSource extends SourceBase {
   readonly id = "hackernews";
 
-  constructor(public config?: { topics?: string[] }) {
+  constructor(public config: HackerNewsConfig = hackernewsConfig) {
     super(config);
-    this.config = config;
   }
 
   async fetchHot() {
-    const res = await fetch(
-      "https://hn.algolia.com/api/v1/search?tags=front_page",
-    );
+    const res = await fetch(this.config.getUrl({}));
     const data = await res.json();
     return this.parseContent(data.hits);
   }
 
-  async fetchContent(topic?: string): Promise<Post[]> {
+  async run(): Promise<Post[]> {
     return await this.withCircuitRetry(
       async () => await this.fetchHot(),
       "HN - hot",

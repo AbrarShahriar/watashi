@@ -3,24 +3,23 @@ import { Post } from "../../types";
 import { SourceBase } from "../SourceBase";
 import { parseRssFeed } from "feedsmith";
 import { parse as parseDom } from "node-html-parser";
-
-type TNSRaw = Rss.Feed<string>;
+import thenewstackConfig, { TheNewStackConfig } from "./thenewstack.config";
+import { TNSRaw } from "./thenewstack.types";
 
 export class TheNewStackSource extends SourceBase {
   readonly id = "thenewstack";
 
-  constructor(public config?: unknown) {
+  constructor(public config: TheNewStackConfig = thenewstackConfig) {
     super(config);
-    this.config = config;
   }
 
   async fetchFeed() {
-    const res = await fetch("https://thenewstack.io/feed");
+    const res = await fetch(this.config.getUrl());
     const data = await res.text();
     return this.parseContent(data);
   }
 
-  async fetchContent(topic?: string): Promise<Post[]> {
+  async run(topic?: string): Promise<Post[]> {
     return await this.withCircuitRetry(
       async () => await this.fetchFeed(),
       "HN - hot",
@@ -29,9 +28,10 @@ export class TheNewStackSource extends SourceBase {
 
   parseContent(rawData: string): Post[] {
     const rssFeed = parseRssFeed(rawData);
+    const items = rssFeed.items || [];
     const parsed: Post[] = [];
-    if (rssFeed && rssFeed.items) {
-      rssFeed.items.forEach((item) => {
+    if (items) {
+      items.forEach((item) => {
         const root = parseDom(item.description!);
         const media =
           root.querySelector(".webfeedsFeaturedVisual")?.getAttribute("src") ||

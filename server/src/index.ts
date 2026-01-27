@@ -1,44 +1,19 @@
 import express, { Request } from "express";
 import { config } from "dotenv";
-import { Sources } from "./source";
 import compression from "compression";
 import * as bodyParser from "body-parser";
-import gmailClient from "./external/gmailclient.js";
+import gmailClient from "./external/gmailclient";
 import { EmailHandler } from "./email/email";
 import { gmail_v1 } from "googleapis";
 import { EmailType } from "./types";
-import { Aggregator } from "./Aggregator";
-import { RedditSource } from "./fetcher/sources/RedditSource";
-import { HackerNewsSource } from "./fetcher/sources/HackerNewsSource";
-import { XSource } from "./fetcher/sources/XSource";
-import { logger } from "./external/logger";
-import { cache } from "./external/cache";
+import { cache } from "./storage/cache";
 import cors from "cors";
-import { TheNewStackSource } from "./fetcher/sources/TheNewStackSource";
 import { paginate } from "./util";
+import { logger } from "./infra/logger";
+import aggregator from "./aggregator/index";
 
 // Inject env variables
 config();
-
-// Aggregator
-const aggregator = new Aggregator();
-aggregator.addSource(
-  new RedditSource({
-    subreddits: Sources.subreddits,
-    redditWorkerUrl: process.env.REDDIT_URL!,
-  }),
-);
-aggregator.addSource(new HackerNewsSource());
-aggregator.addSource(new TheNewStackSource());
-aggregator.addSource(
-  new XSource({
-    users: Sources.xUsers,
-    auth: {
-      gSearchCx: process.env.GOOGLE_SEARCH_CX!,
-      gSearchKey: process.env.GOOGLE_SEARCH_KEY!,
-    },
-  }),
-);
 
 // Initiate singleton email handler
 const emailHandler = new EmailHandler();
@@ -107,7 +82,7 @@ app.get("/all", (req, res) => {
   aggregator.isRunning = true;
 
   logger.info("Aggregation started");
-  aggregator.fetchContent().catch((err) => logger.error(err));
+  aggregator.run().catch((err) => logger.error(err));
 
   res.status(202).json({ message: "Aggregation started" });
 });

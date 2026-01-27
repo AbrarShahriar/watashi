@@ -1,55 +1,13 @@
 import { Post } from "../../types";
 import { SourceBase } from "../SourceBase";
-
-type XUser = {
-  username: string;
-  displayname: string;
-};
-
-type XAuth = {
-  gSearchKey: string;
-  gSearchCx: string;
-};
-
-type XRaw = {
-  kind: string;
-  url: unknown;
-  queries: unknown;
-  context: unknown;
-  searchInformation: unknown;
-  items: {
-    pagemap: {
-      person: {
-        image: string;
-        identifier: string;
-        name: string;
-        alternatename: string;
-        disambiguatingdescription: string;
-        url: string;
-      }[];
-      socialmediaposting: XRawItem[];
-    };
-  }[];
-};
-
-type XRawItem = {
-  identifier: string;
-  commentcount: string;
-  articlebody: string;
-  datecreated: string;
-  url: string;
-  position: string;
-  headline: string;
-  datepublished: string;
-  isbasedon: string;
-};
+import xConfig, { XConfig } from "./x.config";
+import { XUser, XAuth, XRaw, XRawItem } from "./x.types";
 
 export class XSource extends SourceBase {
   readonly id = "x";
 
-  constructor(public config: { users: XUser[]; auth: XAuth }) {
+  constructor(public config: XConfig = xConfig) {
     super(config);
-    this.config = config;
   }
 
   async fetchSingle(user: XUser) {
@@ -60,9 +18,7 @@ export class XSource extends SourceBase {
 
     const query = `"${user.displayname}" inurl:${user.username}  after:${queryDate} intitle:"${user.displayname}"`;
 
-    const response = await fetch(
-      `https://www.googleapis.com/customsearch/v1?key=${this.config.auth.gSearchKey}&cx=${this.config.auth.gSearchCx}&q=${query}&sort=date`,
-    );
+    const response = await fetch(this.config.getUrl({ query }));
 
     const data: XRaw = await response.json();
 
@@ -78,10 +34,10 @@ export class XSource extends SourceBase {
     return this.parseContent(d, { user });
   }
 
-  async fetchContent(): Promise<Post[]> {
+  async run(): Promise<Post[]> {
     const posts: Post[] = [];
 
-    for (const user of this.config.users) {
+    for (const user of this.config.profiles) {
       const content = await this.withCircuitRetry(
         async () => await this.fetchSingle(user),
         user.username,

@@ -1,4 +1,4 @@
-import { logger } from "../external/logger";
+import { logger } from "./logger";
 
 export class Retry {
   constructor(
