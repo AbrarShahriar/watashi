@@ -43,7 +43,7 @@ export function FeedCard({ item }: FeedCardProps) {
 
           {item.media && (
             <Image
-              className=" h-fit"
+              className="rounded-md h-fit"
               width={1000}
               height={1000}
               alt={`Post by ${item.author}`}

@@ -61,12 +61,11 @@ export default function FeedPages({ currentPage, totalPages }: Props) {
         className="bg-transparent"
       >
         <ChevronLeft className="mr-1 h-4 w-4" />
-        Previous
       </Button>
 
       {/* Page numbers */}
       <div className="flex items-center gap-2">
-        {totalPages > 5 && currentPage >= 3 && (
+        {totalPages > 5 && currentPage > 3 && (
           <Ellipsis size={12} className="opacity-50 mr-2.5" />
         )}
         {createPageButtons().map((pageButton, i) => (
@@ -84,7 +83,6 @@ export default function FeedPages({ currentPage, totalPages }: Props) {
         onClick={() => router.push(createPageUrl(currentPage + 1))}
         className="bg-transparent"
       >
-        Next
         <ChevronRight className="ml-1 h-4 w-4" />
       </Button>
     </div>
