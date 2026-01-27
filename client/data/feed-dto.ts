@@ -1,9 +1,14 @@
 import { FeedData, FeedItem } from "@/lib/types";
 import "server-only";
 
-export async function getFeedData() {
+type Options = {
+  page?: number;
+  limit?: number;
+};
+
+export async function getFeedData(opts?: Options) {
   try {
-    const res = await getData();
+    const res = await getData(opts);
 
     if (!res.ok) return [];
 
@@ -15,12 +20,15 @@ export async function getFeedData() {
   }
 }
 
-async function getData() {
-  return await fetch(`${process.env.BACKEND_URL}/feed`, {
-    next: {
-      tags: ["feed-data"],
+async function getData(opts?: Options) {
+  return await fetch(
+    `${process.env.BACKEND_URL}/feed?page=${opts?.page || 1}&limit=${opts?.limit || process.env.ITEM_PER_PAGE}`,
+    {
+      next: {
+        tags: ["feed-data"],
+      },
     },
-  });
+  );
 }
 
 export async function getLastUpdateTime() {
@@ -32,6 +40,19 @@ export async function getLastUpdateTime() {
     const data = await res.json();
 
     return data.lastUpdated;
+  } catch (error) {
+    return 0;
+  }
+}
+export async function getTotalPages() {
+  try {
+    const res = await getData();
+
+    if (!res.ok) return 0;
+
+    const data = await res.json();
+
+    return data.pages;
   } catch (error) {
     return 0;
   }

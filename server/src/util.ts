@@ -1,6 +1,7 @@
 import { CheerioAPI } from "cheerio";
 import sanitizeHtml from "sanitize-html";
 import fs from "fs/promises";
+import { Post } from "./types";
 
 export function truncate(str: string) {
   return str.slice(0, Math.ceil(str.length / 3)) + "...";
@@ -35,4 +36,23 @@ export async function directoryExists(path: string) {
   } catch (error) {
     return false;
   }
+}
+
+export function paginate(
+  data: Record<string, Post[]>,
+  payload: { page: number; limit: number },
+): Record<string, Post[]> {
+  const startIndex = (payload.page - 1) * payload.limit;
+  const keys = Object.keys(data);
+
+  const paginatedData: Record<string, Post[]> = {};
+
+  keys.forEach((key) => {
+    paginatedData[key] = data[key].slice(
+      startIndex,
+      startIndex + payload.limit,
+    );
+  });
+
+  return paginatedData;
 }

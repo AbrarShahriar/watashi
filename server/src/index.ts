@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request } from "express";
 import { config } from "dotenv";
 import { Sources } from "./source";
 import compression from "compression";
@@ -15,6 +15,7 @@ import { logger } from "./external/logger";
 import { cache } from "./external/cache";
 import cors from "cors";
 import { TheNewStackSource } from "./fetcher/sources/TheNewStackSource";
+import { paginate } from "./util";
 
 // Inject env variables
 config();
@@ -61,21 +62,40 @@ app.get("/", async (req, res) => {
 });
 
 // Feed Route
-app.get("/feed", async (req, res) => {
-  let posts = await cache.get();
-  let emails = await emailHandler.getEmailsFromFile();
-  if (!emails) emails = [];
+app.get(
+  "/feed",
+  async (req: Request<{}, {}, {}, { page: string; limit: string }>, res) => {
+    let posts = await cache.get();
+    // let emails = await emailHandler.getEmailsFromFile();
+    // if (!emails) emails = [];
 
-  const lastUpdated = await aggregator.lastRun();
+    const lastUpdated = await aggregator.lastRun();
 
-  const feed = {
-    emails,
-    posts,
-    lastUpdated,
-  };
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
 
-  res.status(200).json(feed);
-});
+    const total = posts
+      ? Object.keys(posts).reduce((total, key) => total + posts[key].length, 0)
+      : 0;
+
+    const paginatedData = posts ? paginate(posts, { page, limit }) : posts;
+
+    let sourcesWithData = 0;
+    posts &&
+      Object.keys(posts).forEach((key) => {
+        if (posts[key].length > 0) sourcesWithData++;
+      });
+
+    const feed = {
+      posts: paginatedData,
+      lastUpdated,
+      total,
+      pages: Math.ceil(1 + total / (sourcesWithData * limit)),
+    };
+
+    res.status(200).json(feed);
+  },
+);
 
 // Fetch route for cron job
 app.get("/all", (req, res) => {

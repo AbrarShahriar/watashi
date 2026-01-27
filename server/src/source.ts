@@ -11,18 +11,18 @@ const subreddits = [
 const hnTopic = ["javascript", "typescript", "java", "web development"];
 
 const xUsers: { username: string; displayname: string }[] = [
-  // {
-  //   username: "florinpop1705",
-  //   displayname: "Florin Pop",
-  // },
-  // {
-  //   username: "catalinmpit",
-  //   displayname: "Catalin",
-  // },
-  // {
-  //   username: "flaviocopes",
-  //   displayname: "flavio",
-  // },
+  {
+    username: "florinpop1705",
+    displayname: "Florin Pop",
+  },
+  {
+    username: "catalinmpit",
+    displayname: "Catalin",
+  },
+  {
+    username: "flaviocopes",
+    displayname: "flavio",
+  },
 ];
 
 export const Sources = {

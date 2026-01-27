@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import FeedHeader from "@/components/feed/FeedHeader";
 
 const ibmPlex = IBM_Plex_Sans({
   variable: "--font-ibmplex-sans",
@@ -28,6 +29,7 @@ export default function RootLayout({
       <body
         className={`${ibmPlex.className} ${ibmMono.className} antialiased dark`}
       >
+        <FeedHeader />
         {children}
       </body>
     </html>

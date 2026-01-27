@@ -7,8 +7,22 @@ import { Post } from "./types";
 export class Aggregator {
   public isRunning: boolean = false;
   private sources: SourceBase[] = [];
+  private successful: SourceBase[] = [];
+  private failed: SourceBase[] = [];
 
   constructor() {}
+
+  public getSources() {
+    return this.sources;
+  }
+
+  public getSuccessfulSources() {
+    return this.successful;
+  }
+
+  public getFailedSources() {
+    return this.failed;
+  }
 
   addSource(source: SourceBase) {
     this.sources.push(source);
@@ -28,8 +42,10 @@ export class Aggregator {
           posts[source.id] = [];
         }
         posts[source.id].push(...content);
+        this.successful.push(source);
       } catch (error) {
         logger.error(`❌ Failed to fetch from ${source.id}:`, error);
+        this.failed.push(source);
       }
     }
 

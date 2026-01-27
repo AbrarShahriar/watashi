@@ -1,8 +1,8 @@
-import { sortBy } from "@/lib/utils";
-import Feed from "../components/feed/Feed";
+import Feed from "@/components/feed/Feed";
 import { getFeedData, getTotalPages } from "@/data/feed-dto";
+import { sortBy } from "@/lib/utils";
 
-export default async function Home({
+export default async function Filter({
   searchParams,
 }: {
   searchParams: { page?: string };
@@ -13,7 +13,7 @@ export default async function Home({
 
   const feedData = await getFeedData({ page: formattedPage });
   const totalPages = await getTotalPages();
-  const sortedFeed = sortBy(feedData, "top") || [];
+  const sortedFeed = sortBy(feedData, "new") || [];
 
   return (
     <Feed

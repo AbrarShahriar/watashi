@@ -1,33 +1,13 @@
-"use client";
-
-import { FeedFilterSortCriteria, FeedItem } from "@/lib/types";
 import { TrendingUp, Clock } from "lucide-react";
-import { Button } from "../ui/button";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { formatRelativeTime } from "@/lib/utils";
+import { formatRelativeTime, generateSourcesFromData } from "@/lib/utils";
+import { getFeedData, getLastUpdateTime } from "@/data/feed-dto";
+import FeedHeaderLink from "./FeedHeaderLink";
 
-interface Props {
-  data: FeedItem[];
-  sources: string[];
-  lastUpdated: number;
-  searchParams?: {
-    category?: FeedFilterSortCriteria;
-    sources?: string;
-  };
-}
-export default function FeedHeader({
-  data,
-  sources,
-  searchParams: params,
-  lastUpdated,
-}: Props) {
-  const router = useRouter();
-
-  const [sortCriteria, setSortCriteria] = useState<FeedFilterSortCriteria>(
-    (params && (params.category as FeedFilterSortCriteria)) || "top",
-  );
+export default async function FeedHeader() {
+  const feedData = await getFeedData();
+  const sources = generateSourcesFromData(feedData);
+  const lastUpdated = await getLastUpdateTime();
 
   // const [query, setQuery] = useState((params && params.toString()) || "");
   // const [selectedSources, setSelectedSources] = useState<Set<string>>(
@@ -62,11 +42,6 @@ export default function FeedHeader({
   //   router.push("/filter" + "?" + query);
   // };
 
-  const handleCategory = (category: FeedFilterSortCriteria) => {
-    setSortCriteria(category);
-    router.push("/filter" + "?category=" + category);
-  };
-
   return (
     <header className="border-b border-border/40 bg-background">
       <div className="mx-auto max-w-3xl px-4 py-8">
@@ -76,7 +51,7 @@ export default function FeedHeader({
               Feed
             </Link>
             <p className="text-sm text-muted-foreground mt-1">
-              {data.length} items from {sources.length} sources collected{" "}
+              {feedData.length} items from {sources.length} sources collected{" "}
               <span className="text-amber-600 lowercase">
                 {formatRelativeTime(lastUpdated)}
               </span>
@@ -85,30 +60,14 @@ export default function FeedHeader({
 
           <div className="flex items-center gap-2">
             <div className="flex gap-1 rounded-lg bg-muted/50 p-1">
-              <Button
-                variant={sortCriteria === "top" ? "secondary" : "ghost"}
-                size="sm"
-                onClick={() => {
-                  router.push("/filter" + "?category=top");
-                  handleCategory("top");
-                }}
-                className="text-xs h-8"
-              >
+              <FeedHeaderLink activeIf={"top"} href={"/"}>
                 <TrendingUp className="mr-1.5 h-3.5 w-3.5" />
                 Top
-              </Button>
-              <Button
-                variant={sortCriteria === "new" ? "secondary" : "ghost"}
-                size="sm"
-                onClick={() => {
-                  router.push("/filter" + "?category=new");
-                  handleCategory("new");
-                }}
-                className="text-xs h-8"
-              >
+              </FeedHeaderLink>
+              <FeedHeaderLink activeIf={"new"} href={"/new"}>
                 <Clock className="mr-1.5 h-3.5 w-3.5" />
                 New
-              </Button>
+              </FeedHeaderLink>
             </div>
 
             {/* Filter Dropdown */}
