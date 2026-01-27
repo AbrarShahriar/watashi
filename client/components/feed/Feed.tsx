@@ -1,8 +1,5 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "../ui/button";
 import FeedList from "./FeedList";
 import { FeedItem } from "@/lib/types";
-import Link from "next/link";
 import FeedPages from "./FeedPages";
 
 interface Props {
