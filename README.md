@@ -1,6 +1,9 @@
 Daily Dev Digest
 
-Issues
+## Ranking
 
-- Scoring issue (the new stack ranks below)
-- In production, user sees cached data on first load
+1. Engagement, e
+2. Recency, r
+3. Quality, q
+
+with source specific weights, w1, w2, w3, ...

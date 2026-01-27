@@ -5,6 +5,7 @@ import { parseRssFeed } from "feedsmith";
 import { parse as parseDom } from "node-html-parser";
 import thenewstackConfig, { TheNewStackConfig } from "./thenewstack.config";
 import { TNSRaw } from "./thenewstack.types";
+import { hoursSince, mulWeights, timeDecay, vectorToScalar } from "../../util";
 
 export class TheNewStackSource extends SourceBase {
   readonly id = "thenewstack";
@@ -46,27 +47,30 @@ export class TheNewStackSource extends SourceBase {
           createdAt: item.pubDate!,
           source: "The New Stack",
           media: media,
-          metadata: {},
-          score: this.calculatePerformanceScore({}, item.pubDate!),
+          score: this.calculatePerformanceScore(item as TNSRaw),
         });
       });
     }
     return parsed;
   }
 
-  public calculatePerformanceScore(
-    metadata: Record<string, unknown>,
-    createdAt: string | number,
-  ): number {
-    const now = Date.now();
-    const itemDate = new Date(createdAt).getTime();
-    const hoursSincePost = (now - itemDate) / (1000 * 60 * 60);
-    let n = hoursSincePost;
-    let recency = 100;
-    for (let i = 0; i < n; i++) {
-      recency -= Math.random() * n;
-    }
-    return recency;
+  public calculatePerformanceScore(post: TNSRaw): number {
+    let e, r, q, c;
+
+    e = 0.1;
+    r = timeDecay(post.pubDate!, 72);
+    q = 0.3;
+    c = 0.2;
+
+    let wE = 1,
+      wR = 3,
+      wQ = 2,
+      wC = 1.5,
+      W = wR + wE + wC + wQ;
+
+    return vectorToScalar(
+      mulWeights([wE / W, wR / W, wQ / W, wC / W], [e, r, q, c]),
+    );
   }
 
   async healthCheck(): Promise<boolean> {

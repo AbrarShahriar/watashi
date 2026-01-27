@@ -9,6 +9,7 @@ export type RedditRaw = {
   ups: number;
   downs: number;
   score: number;
+  num_comments: number;
   stickied: boolean;
   is_gallery?: boolean;
   media_metadata?: {

@@ -7,7 +7,7 @@ export type Post = {
   createdAt: string | number;
   url: string;
   score: number;
-  metadata: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
   media: string | null;
 };
 

@@ -56,3 +56,36 @@ export function paginate(
 
   return paginatedData;
 }
+
+export function hoursSince(createdAt: string | number) {
+  const now = Date.now();
+  const itemDate = new Date(createdAt).getTime();
+  return (now - itemDate) / (1000 * 60 * 60);
+}
+
+export function logSaturationNormalizer(value: number, K: number) {
+  return 1 - Math.exp(-value / K);
+}
+
+export function timeDecay(
+  time: string | number,
+  halfLife: number,
+  given: "age" | "time" = "time",
+) {
+  return given == "age"
+    ? Math.exp(-time / halfLife)
+    : Math.exp(-hoursSince(time) / halfLife);
+}
+
+export function mulWeights(v1: number[], v2: number[]): number[] {
+  if (v1.length != v2.length) throw Error("Uneven Dimensions");
+  const res: number[] = Array.from({ length: v1.length });
+  for (let i = 0; i < v1.length; i++) {
+    res[i] = v1[i] * v2[i];
+  }
+  return res;
+}
+
+export function vectorToScalar(v: number[]): number {
+  return v.reduce((total, val) => (total += val));
+}

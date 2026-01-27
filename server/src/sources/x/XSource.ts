@@ -1,4 +1,11 @@
 import { Post } from "../../types";
+import {
+  hoursSince,
+  logSaturationNormalizer,
+  mulWeights,
+  timeDecay,
+  vectorToScalar,
+} from "../../util";
 import { SourceBase } from "../SourceBase";
 import xConfig, { XConfig } from "./x.config";
 import { XUser, XAuth, XRaw, XRawItem } from "./x.types";
@@ -74,15 +81,8 @@ export class XSource extends SourceBase {
                 title:
                   currentItem.headline ||
                   `Post by ${metadata.user.displayname}`,
-                metadata: {
-                  numOfComments: parseInt(currentItem.commentcount),
-                },
-                score: this.calculatePerformanceScore(
-                  {
-                    numOfComments: parseInt(currentItem.commentcount),
-                  },
-                  currentItem.datepublished,
-                ),
+
+                score: this.calculatePerformanceScore(currentItem),
                 media: null,
               });
             }
@@ -92,6 +92,29 @@ export class XSource extends SourceBase {
     }
 
     return Array.from(parsedPostsMap.values());
+  }
+
+  public calculatePerformanceScore(post: XRawItem): number {
+    let e,
+      r,
+      q,
+      c,
+      K = 200;
+
+    e = logSaturationNormalizer(1.5 * parseInt(post.commentcount), K);
+    r = timeDecay(post.datepublished, 24);
+    q = 0.1;
+    c = 0;
+
+    let wE = 1.5,
+      wR = 1.25,
+      wQ = 1,
+      wC = 1,
+      W = wE + wR + wC + wQ;
+
+    return vectorToScalar(
+      mulWeights([wE / W, wR / W, wQ / W, wC / W], [e, r, q, c]),
+    );
   }
 
   async healthCheck(): Promise<boolean> {
