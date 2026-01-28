@@ -71,7 +71,7 @@ export default function FeedPages({ currentPage, totalPages }: Props) {
         {createPageButtons().map((pageButton, i) => (
           <React.Fragment key={i}>{pageButton}</React.Fragment>
         ))}
-        {totalPages > 5 && !(currentPage + 2 >= totalPages) && (
+        {totalPages >= 5 && currentPage < totalPages - 2 && (
           <Ellipsis size={12} className="opacity-50 ml-2.5" />
         )}
       </div>

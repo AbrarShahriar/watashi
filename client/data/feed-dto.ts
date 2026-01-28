@@ -94,7 +94,7 @@ export function normalizeFeedData(data: FeedData): FeedItem[] {
         url: currentItem.url,
         description: currentItem.description || "",
         source: currentItem.source,
-        score: currentItem.score,
+        score: currentItem.score * 100,
         createdAt: currentItem.createdAt,
         author: currentItem.author,
         media: currentItem.media,

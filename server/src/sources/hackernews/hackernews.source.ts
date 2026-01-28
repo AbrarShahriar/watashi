@@ -51,7 +51,6 @@ export class HackerNewsSource extends SourceBase {
       q,
       c,
       K = 50;
-    const age = hoursSince(post.created_at);
 
     e = logSaturationNormalizer(1.5 * post.points + 2 * post.num_comments, K);
     r = timeDecay(post.created_at, 48);
