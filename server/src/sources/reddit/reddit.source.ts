@@ -3,6 +3,7 @@ import {
   hoursSince,
   logSaturationNormalizer,
   mulWeights,
+  noise,
   timeDecay,
   vectorToScalar,
 } from "../../util";
@@ -82,22 +83,24 @@ export class RedditSource extends SourceBase {
       K = 100;
     const age = hoursSince(post.created_utc * 1000);
     e = logSaturationNormalizer(
-      1.25 * post.ups + 2 * post.num_comments - 1.5 * post.downs,
+      1.5 * post.ups + 2 * post.num_comments - 1.5 * post.downs,
       K,
     );
     r = timeDecay(age, 24, "age");
     q = 0;
-    if (this.getMedia(post)) q += 0.15;
-    if (post.selftext) q += 0.1;
-    c = e == 0 && age < 6 ? 1 : 0;
+    if (this.getMedia(post)) q += 0.2;
+    if (post.selftext) q += 0.2;
+    c = age < 12 ? 0.3 : 0.2;
 
     let wE = 2,
       wR = 1.5,
-      wQ = 1,
+      wQ = 1.5,
       wC = 1.25,
       W = wE + wR + wQ + wC;
-    return vectorToScalar(
-      mulWeights([wE / W, wR / W, wQ / W, wC / W], [e, r, q, c]),
+    return (
+      vectorToScalar(
+        mulWeights([wE / W, wR / W, wQ / W, wC / W], [e, r, q, c]),
+      ) + noise()
     );
   }
 

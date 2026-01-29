@@ -1,0 +1,11 @@
+{
+  "name": "watashi",
+  "version": "1.0.0",
+  "description": "Daily Dev Digest",
+  "scripts": {
+    "add-source": "node scripts/add-source.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

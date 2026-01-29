@@ -1,12 +1,12 @@
 import { TrendingUp, Clock } from "lucide-react";
 import Link from "next/link";
-import { formatRelativeTime, generateSourcesFromData } from "@/lib/utils";
-import { getFeedData, getLastUpdateTime } from "@/data/feed-dto";
+import { formatRelativeTime } from "@/lib/utils";
+import { getFeedData, getLastUpdateTime, getSources } from "@/data/feed-dto";
 import FeedHeaderLink from "./FeedHeaderLink";
 
 export default async function FeedHeader() {
   const feedData = await getFeedData();
-  const sources = generateSourcesFromData(feedData);
+  const sources = await getSources();
   const lastUpdated = await getLastUpdateTime();
 
   // const [query, setQuery] = useState((params && params.toString()) || "");

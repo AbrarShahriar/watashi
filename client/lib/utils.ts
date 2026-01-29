@@ -1,6 +1,5 @@
-import { FeedData, FeedItem } from "@/lib/types";
+import { FeedItem } from "@/lib/types";
 import { clsx, type ClassValue } from "clsx";
-import { Url } from "next/dist/shared/lib/router/router";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -76,12 +75,4 @@ export function sortBy(
   }
 
   return filtered;
-}
-
-export function generateSourcesFromData(data: FeedItem[]) {
-  if (data) {
-    const sourceSet = new Set(data.map((item) => item.source));
-    return Array.from(sourceSet).sort();
-  }
-  return [];
 }

@@ -12,8 +12,14 @@ export class Aggregator {
 
   constructor() {}
 
-  public getSources() {
-    return this.sources;
+  public getSources(ctx: "full" | "partial" = "full", key?: keyof SourceBase) {
+    if (ctx == "full") return this.sources;
+
+    if (ctx == "partial") {
+      return key ? this.sources.map((source) => source[key]) : [];
+    }
+
+    return [];
   }
 
   public getSuccessfulSources() {

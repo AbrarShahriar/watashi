@@ -3,6 +3,7 @@ import {
   hoursSince,
   logSaturationNormalizer,
   mulWeights,
+  noise,
   timeDecay,
   vectorToScalar,
 } from "../../util";
@@ -99,21 +100,25 @@ export class XSource extends SourceBase {
       r,
       q,
       c,
-      K = 200;
+      K = 250;
+    const age = hoursSince(post.datepublished);
+    e = logSaturationNormalizer(2 * parseInt(post.commentcount), K);
+    r = timeDecay(age, 24, "age");
+    q = 0;
+    if (post.headline) q += 0.2;
+    if (post.articlebody.length > 30) q += 0.15;
+    c = age < 8 ? 0.1 : 0.05;
 
-    e = logSaturationNormalizer(1.5 * parseInt(post.commentcount), K);
-    r = timeDecay(post.datepublished, 24);
-    q = 0.1;
-    c = 0;
-
-    let wE = 1.5,
-      wR = 1.25,
-      wQ = 1,
-      wC = 1,
+    let wE = 1.25,
+      wR = 1.1,
+      wQ = 1.2,
+      wC = 1.25,
       W = wE + wR + wC + wQ;
 
-    return vectorToScalar(
-      mulWeights([wE / W, wR / W, wQ / W, wC / W], [e, r, q, c]),
+    return (
+      vectorToScalar(
+        mulWeights([wE / W, wR / W, wQ / W, wC / W], [e, r, q, c]),
+      ) + noise()
     );
   }
 

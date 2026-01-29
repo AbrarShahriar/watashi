@@ -11,8 +11,11 @@ export type Post = {
 };
 
 export type FeedData = {
-  emails: unknown[];
-  posts?: Record<string, Post[]>;
+  emails?: unknown[];
+  posts?: FeedItem[];
+  sources?: string[];
+  lastUpdated?: number;
+  pages: number;
 };
 
 export type FeedItem = Omit<Post, "metadata"> & { score: number };

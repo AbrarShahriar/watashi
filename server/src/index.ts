@@ -11,6 +11,10 @@ import cors from "cors";
 import { paginate } from "./util";
 import { logger } from "./infra/logger";
 import aggregator from "./aggregator/index";
+import { ItsfossSource } from "./sources/itsfoss/itsfoss.source";
+import { UberblogSource } from "./sources/uberblog/uberblog.source";
+import { LinkedinblogSource } from "./sources/linkedinblog/linkedinblog.source";
+import { LogrocketSource } from "./sources/logrocket/logrocket.source";
 
 // Inject env variables
 config();
@@ -36,10 +40,30 @@ app.get("/", async (req, res) => {
   res.status(200).send("OK");
 });
 
+// Test new sources
+app.get("/test", async (req, res) => {
+  const s = new LogrocketSource();
+  let d = await s.run();
+  res.status(200).json(d);
+});
+
 // Feed Route
 app.get(
   "/feed",
-  async (req: Request<{}, {}, {}, { page: string; limit: string }>, res) => {
+  async (
+    req: Request<
+      {},
+      {},
+      {},
+      {
+        page: string;
+        limit: string;
+        sort: "top" | "new";
+        order: "asc" | "desc";
+      }
+    >,
+    res,
+  ) => {
     let posts = await cache.get();
     // let emails = await emailHandler.getEmailsFromFile();
     // if (!emails) emails = [];
@@ -47,13 +71,17 @@ app.get(
     const lastUpdated = await aggregator.lastRun();
 
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 5;
+    const sortBy = req.query.sort || "top";
+    const order = req.query.order || "desc";
 
     const total = posts
       ? Object.keys(posts).reduce((total, key) => total + posts[key].length, 0)
       : 0;
 
-    const paginatedData = posts ? paginate(posts, { page, limit }) : posts;
+    const paginatedData = posts
+      ? paginate(posts, { page, limit, order, sort: sortBy })
+      : posts;
 
     let sourcesWithData = 0;
     posts &&
@@ -65,7 +93,8 @@ app.get(
       posts: paginatedData,
       lastUpdated,
       total,
-      pages: Math.ceil(1 + total / (sourcesWithData * limit)),
+      pages: Math.ceil(total / limit),
+      sources: aggregator.getSources("partial", "id"),
     };
 
     res.status(200).json(feed);

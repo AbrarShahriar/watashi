@@ -17,8 +17,6 @@ export default function FeedPages({ currentPage, totalPages }: Props) {
     return null;
   }
 
-  console.log(totalPages);
-
   const createPageUrl = (page: number) => {
     const params = new URLSearchParams();
     if (page > 1) params.set("page", page.toString());

@@ -12,14 +12,14 @@ export default async function Home({
   const formattedPage = page ? parseInt(page) : 1;
 
   const feedData = await getFeedData({ page: formattedPage });
+
   const totalPages = await getTotalPages();
-  const sortedFeed = sortBy(feedData, "top") || [];
 
   return (
     <Feed
       currentPage={formattedPage}
       totalPages={totalPages}
-      feedItems={sortedFeed}
+      feedItems={feedData}
     />
   );
 }

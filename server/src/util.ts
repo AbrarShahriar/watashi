@@ -40,21 +40,48 @@ export async function directoryExists(path: string) {
 
 export function paginate(
   data: Record<string, Post[]>,
-  payload: { page: number; limit: number },
-): Record<string, Post[]> {
+  payload: {
+    page: number;
+    limit: number;
+    sort: "top" | "new";
+    order: "asc" | "desc";
+  },
+): Post[] {
   const startIndex = (payload.page - 1) * payload.limit;
   const keys = Object.keys(data);
 
-  const paginatedData: Record<string, Post[]> = {};
+  const paginatedData: Post[] = [];
 
   keys.forEach((key) => {
-    paginatedData[key] = data[key].slice(
-      startIndex,
-      startIndex + payload.limit,
-    );
+    paginatedData.push(...data[key]);
   });
 
-  return paginatedData;
+  const sortCriteria = payload.sort == "new" ? "createdAt" : "score";
+
+  return sortData(paginatedData, sortCriteria, payload.order).slice(
+    startIndex,
+    startIndex + payload.limit,
+  );
+}
+
+export function sortData(data: Post[], key: keyof Post, order: "asc" | "desc") {
+  return data.sort((a, b) => {
+    if (typeof b[key] == "number" && typeof a[key] == "number") {
+      if (order == "desc") {
+        return b[key] - a[key];
+      } else {
+        return a[key] - b[key];
+      }
+    } else if (key == "createdAt") {
+      if (order == "desc") {
+        return new Date(b[key]).getTime() - new Date(a[key]).getTime();
+      } else {
+        return new Date(a[key]).getTime() - new Date(b[key]).getTime();
+      }
+    } else {
+      return 1;
+    }
+  });
 }
 
 export function hoursSince(createdAt: string | number) {
@@ -88,6 +115,10 @@ export function mulWeights(v1: number[], v2: number[]): number[] {
 
 export function vectorToScalar(v: number[]): number {
   return v.reduce((total, val) => (total += val));
+}
+
+export function noise(intensifier: number = 0.02) {
+  return Math.random() * intensifier;
 }
 
 const calculate80thPercentile = (data: number[]) => {

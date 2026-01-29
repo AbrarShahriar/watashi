@@ -1,7 +1,9 @@
 import { Post } from "../../types";
 import {
+  hoursSince,
   logSaturationNormalizer,
   mulWeights,
+  noise,
   timeDecay,
   vectorToScalar,
 } from "../../util";
@@ -50,22 +52,26 @@ export class DevtoSource extends SourceBase {
       c,
       K = 125;
 
+    const age = hoursSince(post.published_timestamp);
+
     e = logSaturationNormalizer(
       1.5 * post.positive_reactions_count + 2 * post.comments_count,
       K,
     );
-    r = timeDecay(post.published_timestamp, 48);
-    q = 0.2;
-    c = 0.3;
+    r = timeDecay(age, 48, "age");
+    q = post.public_reactions_count > 10 ? 0.2 : 0.1;
+    c = age < 6 ? 0.3 : 0.15;
 
     let wE = 1.5,
       wR = 2,
       wQ = 1.5,
-      wC = 1.25,
+      wC = 1.5,
       W = wE + wR + wQ + wC;
 
-    return vectorToScalar(
-      mulWeights([wE / W, wR / W, wQ / W, wC / W], [e, r, q, c]),
+    return (
+      vectorToScalar(
+        mulWeights([wE / W, wR / W, wQ / W, wC / W], [e, r, q, c]),
+      ) + noise()
     );
   }
 

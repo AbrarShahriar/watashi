@@ -1,3 +1,3 @@
 import { Rss } from "feedsmith/dist/feeds/rss/common/types.cjs";
 
-export type TNSRaw = Rss.Feed<string>;
+export type LinkedinblogRaw = Rss.Feed<string>;

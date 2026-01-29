@@ -1,5 +1,4 @@
 import { FeedItem } from "@/lib/types";
-import React from "react";
 import EmptyFeed from "./EmptyFeed";
 import { FeedCard } from "./FeedCard";
 

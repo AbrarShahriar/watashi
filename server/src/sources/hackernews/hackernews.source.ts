@@ -3,6 +3,7 @@ import {
   hoursSince,
   logSaturationNormalizer,
   mulWeights,
+  noise,
   timeDecay,
   vectorToScalar,
 } from "../../util";
@@ -50,21 +51,24 @@ export class HackerNewsSource extends SourceBase {
       r,
       q,
       c,
-      K = 50;
+      K = 100;
 
+    const age = hoursSince(post.created_at);
     e = logSaturationNormalizer(1.5 * post.points + 2 * post.num_comments, K);
-    r = timeDecay(post.created_at, 48);
-    q = 0.2;
-    c = 0.3;
+    r = timeDecay(age, 48, "age");
+    q = post.num_comments > 20 ? 0.3 : 0.15;
+    c = age < 6 ? 0.3 : 0.2;
 
-    let wE = 2,
-      wR = 1.5,
-      wQ = 1,
-      wC = 1.5,
+    let wE = 1.5,
+      wR = 1.2,
+      wQ = 1.3,
+      wC = 1.1,
       W = wE + wR + wQ + wC;
 
-    return vectorToScalar(
-      mulWeights([wE / W, wR / W, wQ / W, wC / W], [e, r, q, c]),
+    return (
+      vectorToScalar(
+        mulWeights([wE / W, wR / W, wQ / W, wC / W], [e, r, q, c]),
+      ) + noise()
     );
   }
 
