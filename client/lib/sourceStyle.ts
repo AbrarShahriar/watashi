@@ -27,6 +27,11 @@ export function getSourceStyles(source: string): {
       badge: "bg-pink-500/20 text-pink-400 border-pink-500/30",
       accent: "text-pink-400",
     };
+  } else if (source == "Dev.to") {
+    return {
+      badge: "bg-gray-500/20 text-gray-400 border-gray-500/30",
+      accent: "text-pink-400",
+    };
   } else {
     return {
       badge: "bg-muted text-muted-foreground",
