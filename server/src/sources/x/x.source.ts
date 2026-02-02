@@ -9,7 +9,7 @@ import {
 } from "../../util";
 import { SourceBase } from "../SourceBase";
 import xConfig, { XConfig } from "./x.config";
-import { XUser, XAuth, XRaw, XRawItem } from "./x.types";
+import { XUser, XRaw, XRawItem } from "./x.types";
 
 export class XSource extends SourceBase {
   readonly id = "x";

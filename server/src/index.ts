@@ -11,10 +11,6 @@ import cors from "cors";
 import { paginate } from "./util";
 import { logger } from "./infra/logger";
 import aggregator from "./aggregator/index";
-import { ItsfossSource } from "./sources/itsfoss/itsfoss.source";
-import { UberblogSource } from "./sources/uberblog/uberblog.source";
-import { LinkedinblogSource } from "./sources/linkedinblog/linkedinblog.source";
-import { LogrocketSource } from "./sources/logrocket/logrocket.source";
 
 // Inject env variables
 config();
@@ -42,9 +38,7 @@ app.get("/", async (req, res) => {
 
 // Test new sources
 app.get("/test", async (req, res) => {
-  const s = new LogrocketSource();
-  let d = await s.run();
-  res.status(200).json(d);
+  res.status(200).json(null);
 });
 
 // Feed Route
@@ -102,19 +96,34 @@ app.get(
 );
 
 // Fetch route for cron job
-app.get("/all", (req, res) => {
-  if (aggregator.isRunning) {
-    logger.info("Aggregation already running");
-    return res.status(202).json({ message: "Aggregation already running" });
-  }
+app.get(
+  "/all",
+  (
+    req: Request<
+      {},
+      {},
+      {},
+      {
+        interval: number;
+      }
+    >,
+    res,
+  ) => {
+    if (aggregator.isRunning) {
+      logger.info("Aggregation already running");
+      return res.status(202).json({ message: "Aggregation already running" });
+    }
 
-  aggregator.isRunning = true;
+    aggregator.isRunning = true;
 
-  logger.info("Aggregation started");
-  aggregator.run().catch((err) => logger.error(err));
+    const interval = req.query.interval || 1;
 
-  res.status(202).json({ message: "Aggregation started" });
-});
+    logger.info("Aggregation started");
+    aggregator.runForInterval(interval).catch((err) => logger.error(err));
+
+    res.status(202).json({ message: "Aggregation started" });
+  },
+);
 
 // Webhook to get newsletter updates
 app.post("/gmail/push", async (req, res) => {

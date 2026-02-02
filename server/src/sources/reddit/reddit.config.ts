@@ -3,14 +3,17 @@ import { SourceConfig } from "../SourceConfig";
 export const Config = {};
 
 export class RedditConfig extends SourceConfig {
+  interval = 1;
+
   subreddits: string[] = [
-    "ASCII",
-    "ArtificialInteligence",
+    "buildinpublic",
     "cscareerquestions",
     "csMajors",
     "indianstartups",
     "jobsearchhacks",
-    "leetcode",
+    "indiehackers",
+    "micro_saas",
+    "SideProject",
   ];
 
   getUrl(opts: {

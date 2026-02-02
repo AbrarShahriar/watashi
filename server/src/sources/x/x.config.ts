@@ -2,6 +2,8 @@ import { SourceConfig } from "../SourceConfig";
 import { XAuth, XUser } from "./x.types";
 
 export class XConfig extends SourceConfig {
+  interval = 1;
+
   auth: XAuth = {
     gSearchCx: process.env.GOOGLE_SEARCH_CX!,
     gSearchKey: process.env.GOOGLE_SEARCH_KEY!,

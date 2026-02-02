@@ -1,6 +1,8 @@
 import { SourceConfig } from "../SourceConfig";
 
 export class ItsfossConfig extends SourceConfig {
+  interval = 6;
+
   getUrl({}: {}): string {
     return "https://itsfoss.com/rss";
   }

@@ -3,8 +3,13 @@ import { logger } from "../infra/logger";
 import { Post } from "../types";
 import { CircuitBreaker } from "../infra/CircuitBreaker";
 import { Retry } from "../infra/Retry";
+import { SourceConfig } from "./SourceConfig";
 
 export interface ISourceBase {
+  /**
+   * Unique identifier for each source
+   * @readonly id
+   */
   readonly id: string;
 
   /**
@@ -18,22 +23,36 @@ export interface ISourceBase {
    * Check if the source is healthy/available
    * @returns Promise with boolean health status
    */
-  healthCheck(): Promise<boolean>;
+  parseContent(rawData: unknown[], metadata?: unknown): Post[];
+
+  /**
+   * Calculate the score of each post
+   * @param post Post of type unknown passed with all its properties
+   * @returns number with score
+   */
+  calculatePerformanceScore(post: unknown): number;
 
   /**
    * Check if the source is healthy/available
    * @returns Promise with boolean health status
    */
-  parseContent(rawData: unknown[], metadata?: unknown): Post[];
+  healthCheck(): Promise<boolean>;
+
+  /**
+   * Returns config object of the source
+   * @returns Config object of the source or null
+   */
+  getConfig(): SourceConfig | null;
 }
 
 export abstract class SourceBase implements ISourceBase {
-  id!: string;
+  readonly id!: string;
+
   public circuitBreaker: CircuitBreaker;
   public retry: Retry;
   public logger: winston.Logger;
 
-  constructor(config?: unknown) {
+  constructor(public config?: SourceConfig) {
     this.circuitBreaker = new CircuitBreaker(1, 30000, 10000);
     this.retry = new Retry(1, 1000, 10000);
     this.logger = logger;
@@ -51,8 +70,11 @@ export abstract class SourceBase implements ISourceBase {
     }
   }
 
-  public abstract calculatePerformanceScore(post: unknown): number;
+  getConfig(): SourceConfig | null {
+    return this.config || null;
+  }
 
+  public abstract calculatePerformanceScore(post: unknown): number;
   public abstract run(topic?: string): Promise<Post[]>;
   public abstract parseContent(rawData: unknown, metadata?: unknown): Post[];
   public abstract healthCheck(): Promise<boolean>;

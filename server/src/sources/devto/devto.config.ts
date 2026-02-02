@@ -1,6 +1,8 @@
 import { SourceConfig } from "../SourceConfig";
 
 export class DevtoConfig extends SourceConfig {
+  interval = 1;
+
   getUrl({
     itemsPerPage = 10,
     age = 7,

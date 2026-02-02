@@ -34,10 +34,12 @@ export class Aggregator {
     this.sources.push(source);
   }
 
-  async run(): Promise<Record<string, Post[]>> {
+  async run(
+    sources: SourceBase[] = this.sources,
+  ): Promise<Record<string, Post[]>> {
     const posts: Record<string, Post[]> = {};
 
-    for (const source of this.sources) {
+    for (const source of sources) {
       logger.info(`Starting Aggregation for source: ${source.id}`);
       try {
         const content = await source.run();
@@ -68,6 +70,13 @@ export class Aggregator {
       this.isRunning = false;
     }
     return posts;
+  }
+
+  async runForInterval(interval: number) {
+    const sources = this.sources.filter(
+      (source) => source.getConfig()?.interval == interval,
+    );
+    this.run(sources);
   }
 
   async triggerRevalidate() {

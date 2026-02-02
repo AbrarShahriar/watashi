@@ -1,6 +1,8 @@
 import { SourceConfig } from "../SourceConfig";
 
 export class UberblogConfig extends SourceConfig {
+  interval = 6;
+
   getUrl({}: {}): string {
     return "https://www.uber.com/en-BD/blog/dhaka/engineering/rss/";
   }
